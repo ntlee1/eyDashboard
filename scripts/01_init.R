@@ -10,6 +10,7 @@ pkgReq <- c("tidyverse",
             "scales",
             "ggthemes",
             "magrittr",
-            "rlist"
-)
+            "rlist",
+            "readxl",
+            "stringr")
 lapply(pkgReq, require, character.only = TRUE)

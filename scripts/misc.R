@@ -47,3 +47,13 @@ naRowCheck2 <- function(myDf, myCol) {
 }
 
 testy <- naRowCheck2(kikstrt, 2)
+
+
+
+
+
+test <- ggplot(charAnalysis[1:200,1:2], aes(x = value, y = value, colour = state)) +
+  geom_point(size = 2,
+             position = "jitter") +
+  facet_grid(~state)
+charAnalysis[1:10,1:2]
