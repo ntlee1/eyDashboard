@@ -57,3 +57,22 @@ test <- ggplot(charAnalysis[1:200,1:2], aes(x = value, y = value, colour = state
              position = "jitter") +
   facet_grid(~state)
 charAnalysis[1:10,1:2]
+
+
+
+#Maybe
+#1. Are longer names associated with excess funds raised?
+
+
+goalCharSmall <- nchar(goalSmall$name) 
+summary(goalCharSmall)
+goalCharSmall <- cut(goalCharSmall, breaks = seq(0, 90, by = 10))
+goalCharSmall <- data.frame(table(test))
+
+goalCharSmallFail <- nchar(goalSmallFail$name) 
+goalCharSmallFail <- cut(goalCharSmallFail, breaks = seq(0, 90, by = 10))
+goalCharSmallFail <- data.frame(table(test2))
+summary(goalCharSmallFail)
+
+goalCharSmallJoin <- full_join(goalCharSmall, goalCharSmallFail, by = c("test" = "test2"))
+colnames(goalCharSmall) <- c("Breaks", "Success", "Fail")
