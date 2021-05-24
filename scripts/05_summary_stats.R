@@ -58,14 +58,42 @@ subcatPlots <- function(num) {
   plotly::ggplotly(mySubcatPlot)
 }
 
-#Number of Projects By Currency ------------------------------------------------
 
 
 
 
-subcatPlots(1)
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Average length of a campaign  ------------------------------
+optimalDays <- filter(kikstrt, state == c("successful", "failed"))
+optimalDays$launched <- as.Date(optimalDays$launched, format = "%Y-%m-%d")
+#Average campaign length is ~34 days. No real difference across any category
+optimalDaysMean <-  mean(optimalDays$deadline - optimalDays$launched)
 

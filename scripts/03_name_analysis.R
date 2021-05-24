@@ -31,14 +31,13 @@ wordLenAvgFail <- ttestWord$estimate[2]
 
 #Name Length Analysis by Campaign Size--------------------------------------
 #Bin analysis by successful project quantiles to create 4 rough categories of project size
-projSuccess <- filter(kikstrt, state == "successful")
 #Success Quantiles 1302, 3838, 10000
 #Small, Mid, Large, Premium
+projSuccess <- filter(kikstrt, state == "successful")
 summary(projSuccess$usd_goal_real)
 
-#Compare name, character length, and state by size of campaign
-#TODO
-#Beautify
+#Compare name, character/word length, and state by size of campaign
+#By number of characters
 charKikstrt <- kikstrt[,c("name", "usd_goal_real", "state")]
 charKikstrt$name <- nchar(charKikstrt$name)
 charKikstrt$state <- as.factor(charKikstrt$state)
@@ -88,6 +87,7 @@ goalWordSmall <- filter(wordKikstrt, usd_goal_real < 1302)
 goalWordMid <- filter(wordKikstrt, 1302 <= usd_goal_real & usd_goal_real < 3838) 
 goalWordLarge <- filter(wordKikstrt, 3838 <= usd_goal_real & usd_goal_real < 10000) 
 goalWordPrem <- filter(wordKikstrt, 10000 <= usd_goal_real)
+
 #TODO Beautify and plot other sizes
 goalWordSmallPlot <- goalWordSmall %>%
   ggplot2::ggplot(., aes(x = `Number of Words`, color = state)) +

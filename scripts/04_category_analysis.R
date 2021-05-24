@@ -87,3 +87,5 @@ designSuccess <- arrange(designSuccess, desc(`Pledged Funds/Goal Funds`))
 
 
 
+
+#What are the most common words per category? ----------------------------------

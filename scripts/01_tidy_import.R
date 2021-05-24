@@ -54,4 +54,36 @@ kikstrt[naOut$name,]$name <- "NONAME"
 #view(kikstrt[naOut$`usd pledged`,])
 usdPlgNaRows <- naOut$`usd pledged`
 
+#Fix misleading deadline dates -------------------------------------------------
+#Some launch dates are misformatted as 1970-01-01
+#This is not a valid kickstarter was founded in 2009
+#It appears the web scraping API defaulted to the POSIX start date for an unknown reason
+#For practical purposes I have set the launch date 1 month before deadline
+mod1970 <- (filter(kikstrt, launched < "1971-01-01"))
+# %m+% adds one month. Imported from lubridate
+kikstrt <- full_join(mod1970, kikstrt)
+#Append modifications then filter out erroneous data
+kikstrt <- filter(kikstrt, launched > "1971-01-01")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
