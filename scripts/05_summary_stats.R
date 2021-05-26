@@ -1,11 +1,11 @@
+#Overall summarization stats on entire dataset
 #Create yearly timeline of new projects ----------------------------------------
 timelineKik <- kikstrt
-timelineKik$state <- as.factor(timelineKik$state)
 #Set each launch day to first of month for easy visual analysis
 timelineKik$launchYear <- lubridate::year(timelineKik$launched) %>%
   as.factor()
 
-timelineStateCount <- filter(timelineKik, state == c("successful", "failed")) %>%
+timelineStateCount <- dplyr::filter(timelineKik, state == c("successful", "failed")) %>%
 dplyr::group_by(state, launchYear) %>%
   summarise(n())
 
@@ -29,35 +29,35 @@ categorySummaryCount <- categorySummary %>%
   dplyr::group_by(main_category, category) %>%
   summarise(n())
 
-#15 Unique Main Categories
-catNms <- unique(categorySummaryCount$main_category)
-#159 Unique Sub Categories
-subcatNms <- unique(categorySummaryCount$category)
-
 #Plot all subcategories
-#Call index number of catNms for specific plot
-#non-generalized function
-subcatPlots <- function(num) {
-  
-  myCatNms <- data.frame(x = catNms)
-  myCatNms$x <- as.character(myCatNms$x)
-  myIndex <- myCatNms[num,]
-  mySubcat <- eval(substitute(myIndex))
-
-  mySubcatPlot <- filter(categorySummaryCount,
-                         main_category == mySubcat & !category == mySubcat) %>%
+subcatPlots <- function(mainCategory) {
+  myMainCategory <- mainCategory
+  mySubcatPlot <- dplyr::filter(categorySummaryCount,
+                         main_category == myMainCategory & !category == myMainCategory) %>%
     ggplot2::ggplot(., aes(x = reorder(category, -`n()`), y = `n()`, fill = category)) +
     geom_col(position = "stack") +
     theme(axis.text.x = element_text(angle = 90),
           plot.title = element_text(hjust = 0.5)) +
-    xlab(paste(mySubcat, "Subcategory")) +
+    xlab(paste(myMainCategory, "Subcategory")) +
     ylab("Count") +
-    labs(title = paste("Number of Projects in", mySubcat, "Subcategories 2009-2018")) +
+    labs(title = paste("Number of Projects in", myMainCategory, "Subcategories 2009-2018")) +
     scale_fill_discrete()
   
   plotly::ggplotly(mySubcatPlot)
 }
 
+subCatPlotInput <- data.frame(mainCategory = unique(kikstrt$main_category))
+#as.Character for filter
+subCatPlotInput$mainCategory <- as.character(subCatPlotInput$mainCategory)
+pmap(subCatPlotInput, subcatPlots)
+
+
+
+#Average length of a campaign  -------------------------------------------------
+daysLengthMedian <- dplyr::filter(kikstrt, state == "successful")
+#Median successful campaign length is 30 days. Knowing this helps client
+#plan anticipated timeline for project fundraising
+daysLengthMedian <- stats::median(daysLengthMedian$projDays)
 
 
 
@@ -78,22 +78,4 @@ subcatPlots <- function(num) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-#Average length of a campaign  ------------------------------
-optimalDays <- filter(kikstrt, state == c("successful", "failed"))
-optimalDays$launched <- as.Date(optimalDays$launched, format = "%Y-%m-%d")
-#Average campaign length is ~34 days. No real difference across any category
-optimalDaysMean <-  mean(optimalDays$deadline - optimalDays$launched)
 

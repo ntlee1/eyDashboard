@@ -1,85 +1,25 @@
-#Which main_category has the highest ratio of funds pledged vs goal? -----------
-mainUnique <- c(unique(kikstrt$main_category))
+#Which main_category has the highest ratio of funds pledged vs goal -----------
+#Super successful projects included
+catRatio <- filter(kikstrt, state == "successful")
+catRatio$`pledged/goal` <- catRatio$pledged/catRatio$usd_goal_real
 
-#TODO MAYBE Generalize this function
-mainRatio <- function(x) {
-  filterMe <- filter(kikstrt, kikstrt$main_category == mainUnique[x])[c("usd_pledged_real",
-                                                                 "usd_goal_real")]
-  sum(filterMe$usd_pledged_real)/sum(filterMe$usd_goal_real)
+mainCatRatio <- function(mainCategory) {
+  myCat <- mainCategory
+  filterMe <- filter(catRatio, main_category == myCat)
+  filterMe <- sum(filterMe$usd_pledged_real)/sum(filterMe$usd_goal_real)
+  filterMe <- round(filterMe, digits = 2)
+  cbind(myCat, filterMe)
+   
 }
 
-mainSuccess <- map(c(1:length(mainUnique)), mainRatio) %>%
-  flatten %>%
-  unlist %>%
-   cbind(mainUnique) %>%
-   data.frame
-
-#Category "Design" is has the highest ratio of funds pledged vs goal
-mainSuccess <- mainSuccess[,c(2,1)]
-colnames(mainSuccess) <- c("main_category",
-                          "Pledged Funds/Goal Funds")
-mainSuccess <- arrange(mainSuccess, desc(`Pledged Funds/Goal Funds`))
-
-#Which subcategory of Design has the highest ratio of funds pledged vs goal? ----
-designUnique <- filter(kikstrt, kikstrt$main_category == "Design")
-designUnique <- unique(designUnique$category)
-designRatio <- function(x) {
-  filterMe <- filter(kikstrt, kikstrt$category == designUnique[x])[c("usd_pledged_real",
-                                                                        "usd_goal_real")]
-  sum(filterMe$usd_pledged_real)/sum(filterMe$usd_goal_real)
-}
-
-designSuccess <- map(c(1:length(designUnique)), designRatio) %>%
-  flatten %>%
-  unlist %>% 
-  cbind(designUnique) %>%
-  data.frame
-
-designSuccess <- designSuccess[,c(2,1)]
-colnames(designSuccess) <- c("design_category",
-                           "Pledged Funds/Goal Funds")
-#Typography has raised on average 40% more than its goal amount
-designSuccess <- arrange(designSuccess, desc(`Pledged Funds/Goal Funds`))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+mainCatRatioInput <- data.frame(x = unique(kikstrt$main_category))
+colnames(mainCatRatioInput) <- "mainCategory"
+mainCatRatioInput$mainCategory <- as.character(mainCatRatioInput$mainCategory)
+catRatioResults <- pmap(mainCatRatioInput, mainCatRatio) 
+catRatioResults <- as.data.frame(matrix(unlist(catRatioResults), nrow = 15, byrow = TRUE))
+colnames(catRatioResults) <- c("Category", "pledged/goal")
+#Design has the highest ratio of funds pledged per goal. 400% of goal reached
+catRatioResults <- arrange(catRatioResults, desc(`pledged/goal`))
 
 
 

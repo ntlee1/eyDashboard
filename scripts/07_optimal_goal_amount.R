@@ -38,26 +38,29 @@ breakoutPremMedian <- summary(breakoutPrem$goalExceedRatio)[3]  %>%
 
 
 
-#Step 3: Create function
+#Step 3: Estimate the average number of backers, and their estimated contribution
+#per backer for a given goal amount
 #Goal amount will be used to classify project size and select appropriate
 #goalExceedRatio to define breakout success
 #If goal range exceeds limits of size classification, then the additional points 
 #will be used and not excluded
 #Range will be defined as +- 20% goalExceedRatio
 
-#Inputs: 
-function() {
-  
+#Inputs: myGoalAmount
+test <- function(myGoalAmount) {
+  if(myGoalAmount < 1302)
+   myFilter <-  filter(breakoutFilter, myGoalAmount*0.8 <= usd_goal_real, usd_goal_real <= myGoalAmount*1.2) 
+  backerAvgPledge <- (mean(myFilter$usd_pledged_real)/mean(myFilter$backers)) %>%
+    round(., digits = 2)
+  backerAvgCount <- mean(myFilter$backers) %>%
+    round(., digits = 0)
+  paste("For a kickstarter goal of", paste0("$", myGoalAmount, ","), "the average number of backers is", backerAvgCount, "and the average contribution per backer is", paste0("$", backerAvgPledge, "."))
 }
 
 
 
 
-
-
-
-
-
+test(300)
 
 
 
