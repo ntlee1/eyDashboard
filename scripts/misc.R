@@ -30,3 +30,92 @@ subcatPlots <- function(subcatName) {
     labs(title = paste("Number of Projects in", mySubcat, "Subcategories 2009-2018")) +
     scale_fill_discrete()
 }
+
+
+#Copy to notes
+mainCatRatio <- function(mainCategory) {
+  catRatio <- filter(kikstrt, state == "successful")
+  catRatio$`pledged/goal` <- catRatio$pledged/catRatio$usd_goal_real
+  
+  mainCatRatioInput <- data.frame(x = unique(kikstrt$main_category))
+  colnames(mainCatRatioInput) <- "mainCategory"
+  
+  #Convert input name to character to find matching index in possible arguments
+  #Input is seen as a variable, convert that variable to character
+  myCatIndex <- which(mainCatRatioInput$mainCategory == deparse(substitute(mainCategory)))
+  myCat <-mainCatRatioInput$mainCategory[myCatIndex]
+  
+  filterMe <- filter(catRatio, main_category == myCat)
+  filterMe <- sum(filterMe$usd_pledged_real)/sum(filterMe$usd_goal_real)
+  return(list(filterMe, myCat))
+}
+
+mainCatRatio(Food)
+
+
+
+subCatPlotOutput[1]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+testMe <- subCatPlotOutput[1]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
