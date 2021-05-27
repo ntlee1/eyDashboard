@@ -171,7 +171,6 @@ var(ofxPledgeCompare)
 #Drop usd pledged for inaccuracy
 kikstrt <- select(kikstrt, -c(`usd pledged`))
 
-<<<<<<< HEAD
 #Create 4 categories of project size using quantiles ---------------------------
 #of usd_goal_real, state = success
 #Quantiles = 1302, 3838, 10000
@@ -246,8 +245,6 @@ breakoutFilter <- rbind(breakoutSmall,
 
 
 
-=======
->>>>>>> 8713d66891ab160acbae6899b431ad7e24fc562e
 
 
 
@@ -269,22 +266,4 @@ breakoutFilter <- rbind(breakoutSmall,
 
 
 
-#Create 4 categories of project size using quantiles ---------------------------
-#of usd_goal_real, state = success
-#Quantiles = 1302, 3838, 10000
-#Project Sizes: Small, Mid, Large, Premium
-kikSmall <- filter(kikstrt, usd_goal_real < 1302) 
-kikSmall$size <- "Small"
-kikMid <- filter(kikstrt, 1302 <= usd_goal_real & usd_goal_real < 3838)
-kikMid$size <- "Mid"
-kikLarge <- filter(kikstrt, 3838 <= usd_goal_real & usd_goal_real < 10000) 
-kikLarge$size <- "Large"
-kikPrem <- filter(kikstrt, 10000 <= usd_goal_real)
-kikPrem$size <- "Prem"
-#Add size classification
-kikstrt <- rbind(kikSmall, kikMid, kikLarge, kikPrem) %>%
-  data.frame
 
-#Add Length of Campaign --------------------------------------------------------
-kikstrt$projDays <- (kikstrt$deadline - kikstrt$launched) %>%
-  as.numeric

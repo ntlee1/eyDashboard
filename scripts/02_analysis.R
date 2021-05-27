@@ -232,7 +232,7 @@ daysLengthMedian <- dplyr::filter(kikstrt, state == "successful")
 #plan anticipated timeline for project fundraising
 daysLengthMedian <- stats::median(daysLengthMedian$projDays)
 
-
+#
 
 
 
