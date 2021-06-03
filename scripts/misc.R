@@ -50,50 +50,6 @@ mainCatRatio <- function(mainCategory) {
   return(list(filterMe, myCat))
 }
 
-mainCatRatio(Food)
-
-
-
-subCatPlotOutput[1]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-testMe <- subCatPlotOutput[1]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -22,8 +22,7 @@ ui <- fluidPage(
                             tabPanel("Category ",
                                      selectInput("subcatPlot",
                                                  "Select Subcategory",
-                                                 choices = c("Food",
-                                                             "Art"),
+                                                 choices = c(subCatPlotInput$mainCategory),
                                                  selected = "Art"),
                                      plotOutput("myPlot")
                                      
@@ -55,9 +54,22 @@ server <- function(input, output, session) {
 
   #EDIT Plotly in viewer pane not
   output$myPlot <- renderPlot({
-  if(input$subcatPlot =="Food") {
-    subCatPlotOutput[1]
-  }
+    switch(input$subcatPlot, 
+           "Food" = subCatPlotOutput[1],
+           "Music" = subCatPlotOutput[2],
+           "Comics" = subCatPlotOutput[3],
+           "Design" = subCatPlotOutput[4],
+           "Art" = subCatPlotOutput[5],
+           "Fashion" = subCatPlotOutput[6],
+           "Film & Video" = subCatPlotOutput[7],
+           "Publishing" = subCatPlotOutput[8],
+           "Technology" = subCatPlotOutput[9],
+           "Games" = subCatPlotOutput[10],
+           "Photography" = subCatPlotOutput[11],
+           "Dance" = subCatPlotOutput[12],
+           "Crafts" = subCatPlotOutput[13],
+           "Journalism" = subCatPlotOutput[14],
+           "Theater" = subCatPlotOutput[15])
   })
   
   
