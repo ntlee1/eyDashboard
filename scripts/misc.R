@@ -53,6 +53,19 @@ mainCatRatio <- function(mainCategory) {
 
 
 
+Kik$duplicateIdKik <- dplyr::filter(Kik$kiksrt, ID %in% Kik$duplicateId$Var1)
+#Remove duplicate data
+Kik$kiksrt <- Kik$kiksrt[!duplicateinstd(Kik$kiksrt[,c("ID")]),]
+#TRUE
+length(Kik$kiksrt$ID) == length(unique(Kik$kiksrt$ID))
+
+
+
+
+#Global vars will be reused often throughout scripts ---------------------------
+#Useful vars stored here for easy reference and reuse throughout project
+#Var: Filters
+Kik$kikSuccess <- dplyr::filter(Kik$kiksrt, state == "successful")
 
 
 
@@ -60,6 +73,39 @@ mainCatRatio <- function(mainCategory) {
 
 
 
+
+
+
+
+
+
+
+
+
+Kik$NmTknFun("Food")
+
+
+
+
+
+
+
+layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
+par(mar=rep(0, 4))
+plot.new()
+text(x=0.5, y=0.5, "Title of my first plot")
+
+
+Kik$NmTknMainPlotOutput[[1]]
+
+Kik$subCatPlotOutput[[1]]
+
+
+
+
+
+#Maybe a direct call is eaiser in shiny
+Kik$NmTknMainPlot("Food")
 
 
 

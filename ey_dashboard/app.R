@@ -18,11 +18,11 @@ ui <- fluidPage(
                  tabPanel("General Summary",
                           tabsetPanel(
                             tabPanel("New Project Timeline",
-                                     timelineStateCountPlot),
+                                     Kik$timelineStCtPlot),
                             tabPanel("Category ",
                                      selectInput("subcatPlot",
                                                  "Select Subcategory",
-                                                 choices = c(subCatPlotInput$mainCategory),
+                                                 choices = c(Kik$subCatPlotInput$mainCategory),
                                                  selected = "Art"),
                                      plotOutput("myPlot")
                                      
@@ -53,23 +53,24 @@ server <- function(input, output, session) {
   
 
   #EDIT Plotly in viewer pane not
+  #EDIT Fix order
   output$myPlot <- renderPlot({
     switch(input$subcatPlot, 
-           "Food" = subCatPlotOutput[1],
-           "Music" = subCatPlotOutput[2],
-           "Comics" = subCatPlotOutput[3],
-           "Design" = subCatPlotOutput[4],
-           "Art" = subCatPlotOutput[5],
-           "Fashion" = subCatPlotOutput[6],
-           "Film & Video" = subCatPlotOutput[7],
-           "Publishing" = subCatPlotOutput[8],
-           "Technology" = subCatPlotOutput[9],
-           "Games" = subCatPlotOutput[10],
-           "Photography" = subCatPlotOutput[11],
-           "Dance" = subCatPlotOutput[12],
-           "Crafts" = subCatPlotOutput[13],
-           "Journalism" = subCatPlotOutput[14],
-           "Theater" = subCatPlotOutput[15])
+           "Food" = Kik$subCatPlotOutput[1],
+           "Music" = Kik$subCatPlotOutput[2],
+           "Comics" = Kik$subCatPlotOutput[3],
+           "Design" = Kik$subCatPlotOutput[4],
+           "Art" = Kik$subCatPlotOutput[5],
+           "Fashion" = Kik$subCatPlotOutput[6],
+           "Film & Video" = Kik$subCatPlotOutput[7],
+           "Publishing" = Kik$subCatPlotOutput[8],
+           "Technology" = Kik$subCatPlotOutput[9],
+           "Games" = Kik$subCatPlotOutput[10],
+           "Photography" = Kik$subCatPlotOutput[11],
+           "Dance" = Kik$subCatPlotOutput[12],
+           "Crafts" = Kik$subCatPlotOutput[13],
+           "Journalism" = Kik$subCatPlotOutput[14],
+           "Theater" = Kik$subCatPlotOutput[15])
   })
   
   
