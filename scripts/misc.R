@@ -72,8 +72,8 @@ length(Kik$kiksrt$ID) == length(unique(Kik$kiksrt$ID))
 
 
 
-
-
+################
+#Working output
 #Find which words are found in both datasets
 test1 <- Kik$tknRankMain("Food", "GBP")[1:100,1] %>%
   cbind(., 1:100)
@@ -95,7 +95,7 @@ testDiff3 <- dplyr::filter(test1, word %in% test2$word)
 #Test2 rank positions
 testDiff4 <- dplyr::filter(test2, word %in% test1$word)
 
-#Comapre Ranks
+#Compare Ranks
 #Take note of big differences in rank
 #They explain cultural differences
 compMe <- cbind(gbp = arrange(testDiff3, word), usd = arrange(testDiff4, word))
@@ -105,34 +105,27 @@ compMe <- arrange(compMe, `gbp.1:100`)
 #Add back in gbp words not found in usd
 #Assign usd position of NA
 testNow <- dplyr::filter(test1, !(word %in% test2$word))
-testNow$usdPosition <- 9999
+testNow$usdPosition <- 99999
 colnames(testNow)[1:2] <- c("gbp.word", "gbp.1:100")
 
 goodTest <- rbind(compMe, testNow)
 #Final output. Ranked gbp words compared to usd rank.
 goodTest <- arrange(goodTest, `gbp.1:100`)
 
+#################
 
 
 
 
-
-
-
-
-
-
-
-
-
-#100 Most Popular Words Rank Comparison by Currency
-Kik$tknFxRank <- function(curr1, curr2, mainCat) {
-  myCurr1 <- Kik$tknRankMain(mainCat, curr1)[1:100,1] %>%
-    cbind(., 1:100)
-  myCurr2 <- Kik$tknRankMain(mainCat, curr2)[1:100,1] %>%
-    cbind(., 1:100)
-  #CONT
-}
+###
+###############################################
+ggplot2::ggplot(Kik$kiksrt, aes(x = projLen, y = ID)) +
+  geom_col(fill = "blue") +
+  xlab("Days") +
+  labs(title = "Length of Kickstarter Projects 2009-2018") +
+  scale_y_discrete(labels = NULL, breaks = NULL) +
+  theme(axis.title.y = element_blank(),
+        plot.title = element_text(hjust = 0.5)) 
 
 
 

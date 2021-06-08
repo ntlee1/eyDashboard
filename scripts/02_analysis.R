@@ -562,8 +562,6 @@ Kik$timelineStCtPlot <-  Kik$timelineStCt %>%
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_y_continuous(breaks = seq(from = 0, to = 25000, by = 2500))
 
-Kik$timelineStCtPlot <- plotly::ggplotly(Kik$timelineStCtPlot)
-
 #Breakdown of Number of Projects per Category ----------------------------------
 Kik$catSmry <- dplyr::filter(Kik$kiksrt, state == "successful" | state == "failed") 
 Kik$catSmry$category <- as.factor(Kik$catSmry$category)
@@ -585,17 +583,18 @@ Kik$subcatPlot <- function(mainCategory) {
           plot.title = element_text(hjust = 0.5)) +
     xlab(paste(myMainCategory, "Subcategory")) +
     ylab("Count") +
-    labs(title = paste("Number of Projects in", myMainCategory,
+    labs(title = paste("Number of Campaigns in", myMainCategory,
                        "Subcategories 2009-2018")) +
     scale_fill_discrete()
   
   mySubcatPlot
 }
 
-Kik$subCatPlotInput <- data.frame(mainCategory = unique(Kik$kiksrt$main_category))
-#as.Character for dplyr::filter
-Kik$subCatPlotInput$mainCategory <- as.character(Kik$subCatPlotInput$mainCategory)
-Kik$subCatPlotOutput <- pmap(Kik$subCatPlotInput, Kik$subcatPlot)
+
+#Kik$subCatPlotInput <- data.frame(mainCategory = unique(Kik$kiksrt$main_category))
+##as.Character for dplyr::filter
+#Kik$subCatPlotInput$mainCategory <- as.character(Kik$subCatPlotInput$mainCategory)
+#Kik$subCatPlotOutput <- pmap(Kik$subCatPlotInput, Kik$subcatPlot)
 
 
 
