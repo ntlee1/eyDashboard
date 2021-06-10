@@ -1,14 +1,20 @@
 library(shiny)
 library(shinyalert)
 library(here)
+library(shinyWidgets)
+
+eyYellow <- "color: #FFE700;"
+tabTitle <- "color: white"
 
 ui <- fluidPage(
   #Welcome Popup
   #test <- modalDialog(includeHTML(here::here("html","welcome.html"))),
-  
-  headerPanel(list(img(src = "eylogo.png",
-                       height = 90,
-                       width = 90,
+
+  shinyWidgets::setBackgroundColor("#1C2134"),
+
+  headerPanel(list(img(src = "eyLogo.png",
+                       height = 135,
+                       width = 240,
                        style = "vertical-align: bottom;"))),
   
   sidebarLayout(
@@ -17,77 +23,75 @@ ui <- fluidPage(
                           htmlOutput("introVid")),
                  tabPanel("General Summary",
                           tabsetPanel(
-                            tabPanel("New Project Timeline",
-                                     plotOutput("myTimeline")),
-                            tabPanel("Category",
+                            tabPanel(div("New Campaign Timeline",
+                                     style = eyYellow),
+                                     plotOutput("myTimeline"),
                                      selectInput("mainCatPlot",
-                                                 "Select Main Category",
+                                                 div("Select Main Category",
+                                                 style = tabTitle),
                                                  choices = c(Kik$mainCatPlotInput$mainCategory),
                                                  selected = "Art"),
                                      plotOutput("myPlot")),
-                            tabPanel("Avg Campaign Length",
-                                     plotOutput("AvgCampLen")),
-                            tabPanel("Funds Ratio",
-                                     tableOutput("myFundsRatio")),
-                            tabPanel("Partial Funds",
+                            tabPanel(div("Funds Ratio",
+                                     style = eyYellow),
+                                     div(tableOutput("myFundsRatio"),
+                                     style = tabTitle)),
+                            tabPanel(div("Partial Funds",
+                                     style = eyYellow),
                                      selectInput("partialPlot",
-                                                 "Select Size",
+                                                 div("Select Size",
+                                                 style = tabTitle),
                                                  choices = c("Small",
                                                              "Mid",
                                                              "Large",
                                                              "Prem"),
-                                                             selected = "Small"),
-                                     plotOutput("partialFundPlot")),
-                            tabPanel("Name Length",
-                                     plotOutput("myCharPlot"))
-                            )
-                          ),
+                                                 selected = "Small"),
+                                     plotOutput("partialFundPlot"))
+                          )
+                 ),
                  tabPanel("Campaign Name Analysis",
                           tabsetPanel(
-                            tabPanel("Top Words Overall",
-                                     tableOutput("kikNmAllOut")),
-                            tabPanel("Top 100 Words Main Category",
+                            tabPanel(div("Name Length",
+                                     style = eyYellow),
+                                     plotOutput("myCharPlot")),
+                            tabPanel(div("Top Words Overall",
+                                     style = eyYellow),
+                                     div(tableOutput("kikNmAllOut"),
+                                     style = tabTitle)),
+                            tabPanel(div("Top 100 Words Main Category",
+                                     style = eyYellow),
+                                     plotOutput("nmTknMainPlotOut"),
                                      selectInput("tknRankMain",
-                                                 "Select Main Category",
+                                                 div("Select Main Category",
+                                                 style = tabTitle),
                                                  choices = unique(Kik$kiksrt$main_category),
                                                  selected = "Art"),
-                                     tableOutput("tknRankMainTable")),
-                            tabPanel("Top 100 Words Sub Category",
-                                     selectInput("tknRankSub",
-                                                 "Select Sub Category",
-                                                 choices = unique(Kik$kiksrt$category),
-                                                 selected = "Poetry"),
-                                     tableOutput("tknRankSubTable")),
-                            tabPanel("Top 60 Main WC",
-                                     selectInput("nmTknMainPlot",
-                                                 "Select Main Category",
-                                                 choices = unique(Kik$kiksrt$main_category),
-                                                 selected = "Art"),
-                                     plotOutput("nmTknMainPlotOut")),
-                            tabPanel("Top 60 Sub WC",
-                                     selectInput("nmTknSubPlot",
-                                                 "Select Sub Category",
-                                                 choices = unique(Kik$kiksrt$category),
-                                                 selected = "Poetry"),
-                                     plotOutput("nmTknSubPlotOut")),
-                            tabPanel("Main Category FX Rank",
+                                     div(tableOutput("tknRankMainTable"),
+                                     style = tabTitle)),
+                            tabPanel(div("Main Category FX Rank",
+                                     style = eyYellow),
                                      selectInput("FX",
-                                                 "Select Base Currency",
+                                                 div("Select Base Currency",
+                                                 style = tabTitle),
                                                  choices = unique(Kik$kiksrt$currency),
                                                  selected = "USD"),
                                      selectInput("FX2",
-                                                 "Select Compare Currency",
+                                                 div("Select Compare Currency",
+                                                 style = tabTitle),
                                                  choices = unique(Kik$kiksrt$currency),
                                                  selected = "GBP"),
                                      selectInput("FXCat",
-                                                 "Select Main Category",
+                                                 div("Select Main Category",
+                                                 style = tabTitle),
                                                  choices = unique(Kik$kiksrt$main_category),
                                                  selected = "Art"),
-                                     tableOutput("FXTable"))
-                          ))
+                                     div(tableOutput("FXTable"),
+                                     style = tabTitle))
+                          )
+                 )
     ),
     mainPanel(
-   
+      
       
       
     )
@@ -97,44 +101,28 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   #showModal(test)
   Shy <- new.env()
+
   
-#Campaign Name Analysis --------------------------------------------------------
-
-#Top 100 Words Overall
+  #Campaign Name Analysis --------------------------------------------------------
+  
+  #Top 100 Words Overall
   output$kikNmAllOut <- renderTable(Kik$kikNmAll)
-
-#Top 100 Words Main Category
+  
+  #Top 100 Words Main Category
   output$tknRankMainTable <- renderTable({
     input1 <- reactive({input$tknRankMain})
     myPlot <- Kik$tknRankMain(input1())
     myPlot
   })
-  
-#Top 100 Words Sub Category
-  output$tknRankSubTable <- renderTable({
-    input1 <- reactive({input$tknRankSub})
-    myPlot <- Kik$tknRankSub(input1())
-    myPlot
-  })
-  
-  
-#Top 60 Main Category WC
+  #wc
   output$nmTknMainPlotOut <-renderPlot({
-    myCat <- reactive({input$nmTknMainPlot})
+    myCat <- reactive({input$tknRankMain})
     
     myPlot <- Kik$nmTknMainPlot(mainCat = myCat())
     myPlot
   })
-
-#Top 60 Sub Cat WC
-  output$nmTknSubPlotOut <-renderPlot({
-    myCat <- reactive({input$nmTknSubPlot})
-    
-    myPlot <- Kik$nmTknSubPlot(subCat = myCat())
-    myPlot
-  })  
-
-#Main Cat FX Rank
+  
+  #Main Cat FX Rank
   output$FXTable <- renderTable({
     myFx1 <- reactive({input$FX})
     myFx2 <- reactive({input$FX2})
@@ -152,8 +140,6 @@ server <- function(input, output, session) {
   
   
   
-  
-  output$AvgCampLen <- renderPlot(Kik$projLenMedianPlot)
   
   output$myCharPlot <- renderPlot(Kik$charPlot)
   
@@ -174,7 +160,7 @@ server <- function(input, output, session) {
                 width = 600, height = 400)
   })
   
-
+  
   #EDIT Plotly in viewer pane not
   #EDIT Fix order
   output$myPlot <- renderPlot({
