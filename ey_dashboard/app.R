@@ -5,12 +5,18 @@ library(shinyWidgets)
 
 eyYellow <- "color: #FFE700;"
 tabTitle <- "color: white"
+Shy <- new.env()
+
 
 ui <- fluidPage(
   #Welcome Popup
   #test <- modalDialog(includeHTML(here::here("html","welcome.html"))),
 
   shinyWidgets::setBackgroundColor("#1C2134"),
+  tags$style(HTML(".tabbable > .nav  > li > a:link {background-color:#1C2134}")),
+
+
+
 
   headerPanel(list(img(src = "eyLogo.png",
                        height = 135,
@@ -50,7 +56,7 @@ ui <- fluidPage(
                           )
                  ),
                  tabPanel("Campaign Name Analysis",
-                          tabsetPanel(
+                          tabsetPanel(id = "tabsetHere",
                             tabPanel(div("Name Length",
                                      style = eyYellow),
                                      plotOutput("myCharPlot")),
@@ -58,7 +64,7 @@ ui <- fluidPage(
                                      style = eyYellow),
                                      div(tableOutput("kikNmAllOut"),
                                      style = tabTitle)),
-                            tabPanel(div("Top 100 Words Main Category",
+                            tabPanel(div("Most Popular Words Main Category",
                                      style = eyYellow),
                                      plotOutput("nmTknMainPlotOut"),
                                      selectInput("tknRankMain",
@@ -100,10 +106,12 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   #showModal(test)
-  Shy <- new.env()
 
   
   #Campaign Name Analysis --------------------------------------------------------
+
+  
+  
   
   #Top 100 Words Overall
   output$kikNmAllOut <- renderTable(Kik$kikNmAll)
@@ -186,11 +194,6 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
-
-
-
-
-
 
 
 

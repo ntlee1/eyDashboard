@@ -19,6 +19,14 @@ Kik$colFct <- c("category",
 Kik$kiksrt[, Kik$colFct] <- lapply(Kik$kiksrt[, Kik$colFct],
                                    as.factor)
 
+
+#Shiny UI Plot Modifications 
+Shy$plotColsEy <- list(theme(plot.background = element_rect(fill = "#1C2134"),
+                             text = element_text(color = "white"),
+                             axis.text = element_text(color = "white"),
+                             legend.background = element_rect(fill = "#1C2134"),
+                             legend.text = element_text(color = "white")))
+
 #Cleanse and Check Each Column for Errors --------------------------------------
 #NAs ---------------------------------------------------------------------------
 #name, usd_pledged have NAs.
@@ -299,6 +307,7 @@ Kik$charPlot <-
   ylab("Number of Kickstarter Projects") +
   labs(title = "Length of Successful Kickstarter Campaign Names by Size") +
   theme(plot.title = element_text(hjust = 0.5)) +
+  Shy$plotColsEy +
   scale_colour_discrete()
 Kik$charPlot
 
@@ -556,7 +565,9 @@ Kik$timelineStCtPlot <-  Kik$timelineStCt %>%
   ylab("Number of Kickstarter Campaigns") +
   labs(title = "Kickstarter Campaigns Launched by Year") +
   theme(plot.title = element_text(hjust = 0.5)) +
+  Shy$plotColsEy +
   scale_y_continuous(breaks = seq(from = 0, to = 25000, by = 2500))
+
 
 #Breakdown of Number of Projects per Category ----------------------------------
 Kik$catSmry <- dplyr::filter(Kik$kiksrt, state == "successful" | state == "failed") 
@@ -577,6 +588,7 @@ Kik$mainCatPlot <- function(mainCategory) {
     geom_col(position = "stack") +
     theme(axis.text.x = element_text(angle = 90),
           plot.title = element_text(hjust = 0.5)) +
+    Shy$plotColsEy +
     xlab(paste(myMainCategory, "Subcategory")) +
     ylab("Count") +
     labs(title = paste("Number of Campaigns in", myMainCategory,
@@ -686,6 +698,7 @@ Kik$partialFailPlot <- function(size) {
     geom_histogram(stat = "identity") +
     theme(axis.text.x = element_text(angle = 90),
           plot.title = element_text(hjust = 0.5)) +
+    Shy$plotColsEy +
     scale_fill_discrete() +
     xlab("Percent Breaks") +
     ylab("Number of Kickstarter Campaigns") +
