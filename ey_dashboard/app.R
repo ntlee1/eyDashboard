@@ -5,6 +5,7 @@ library(here)
 ui <- fluidPage(
   #Welcome Popup
   #test <- modalDialog(includeHTML(here::here("html","welcome.html"))),
+  
   headerPanel(list(img(src = "eylogo.png",
                        height = 90,
                        width = 90,
@@ -17,23 +18,19 @@ ui <- fluidPage(
                  tabPanel("General Summary",
                           tabsetPanel(
                             tabPanel("New Project Timeline",
-                                     Kik$timelineStCtPlot),
+                                     plotOutput("myTimeline")),
                             tabPanel("Category ",
                                      selectInput("subcatPlot",
                                                  "Select Subcategory",
                                                  choices = c(Kik$subCatPlotInput$mainCategory),
                                                  selected = "Art"),
                                      plotOutput("myPlot")),
-                            tabPanel("Campaign Length",
-                                     Kik$projLenMedianPlot)
-                                     
-                                  
-                                     ))
+                            tabPanel("Partial Raise",
+                                     tableOutput("myPartialRaise"))
+                            )
                           ),
                  tabPanel("Optimal Name Length"),
-                 tabPanel("Optimal Category"),
-                 tabPanel("Optimal Campaign Length"),
-                 tabPanel("Optimal Goal Amount")
+                 tabPanel("Optimal Category")
                  
     ),
     mainPanel(
@@ -45,11 +42,20 @@ ui <- fluidPage(
 )
 
 server <- function(input, output, session) {
+  #showModal(test)
+  
+  output$myPartialRaise <- renderTable(Kik$catRatioResults)
+  
+  output$myTimeline <- renderPlot(Kik$timelineStCtPlot)
+  
   output$introVid <- renderUI({
     tags$iframe(src = "https://www.youtube.com/embed/hfPnq3i4Udw",
                 width = 600, height = 400)
   })
   
+
+  #EDIT Plotly in viewer pane not
+  #EDIT Fix order
   output$myPlot <- renderPlot({
     switch(input$subcatPlot, 
            "Food" = Kik$subcatPlot("Food"),
@@ -73,6 +79,7 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
+
 
 
 
