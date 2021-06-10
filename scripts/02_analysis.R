@@ -199,6 +199,9 @@ Kik$kiksrt[3838 <= Kik$kiksrt$usd_goal_real &
 Kik$kiksrt[10000 <= Kik$kiksrt$usd_goal_real, "size"] <- "Prem"
 dplyr::filter(Kik$kiksrt, size == "empty")
 
+Kik$kiksrt$size <- factor(Kik$kiksrt$size,
+                          levels = c("Small", "Mid", "Large", "Prem"))
+
 #Add Length of Campaign --------------------------------------------------------
 Kik$kiksrt$projLen <- (Kik$kiksrt$deadline - Kik$kiksrt$launched) %>%
   as.numeric
@@ -294,11 +297,10 @@ Kik$charPlot <-
             stat = "bin", size = 1) +
   xlab("Kickstarter Name Length (characters)") +
   ylab("Number of Kickstarter Projects") +
-  labs(title = "Length of Kickstarter Project Names by Project Size") +
+  labs(title = "Length of Successful Kickstarter Campaign Names by Size") +
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_colour_discrete()
 Kik$charPlot
-
 
 #What words are associated with each category? ---------------------------------
 #Overall
@@ -315,9 +317,11 @@ Kik$customStopWords <- bind_rows(tibble(word = c("canceled"),
                       stop_words)
 Kik$kikNmTkn <- Kik$kikNmTkn %>%
   dplyr::anti_join(Kik$customStopWords)
-#Top words overall include album, film, project
+#Top 100 words overall include album, film, project
 Kik$kikNmAll <- Kik$kikNmTkn %>%
   dplyr::count(word, sort = TRUE)
+Kik$kikNmAll <- Kik$kikNmAll[1:100,]
+colnames(Kik$kikNmAll) <- c("Word", "Use Frequency")
 
 #Main Category Freq Table Top 100
 Kik$tknRankMain <- function(mainCat) {
@@ -405,7 +409,7 @@ Kik$nmTknSubPlot <- function(subCat) {
   par(mar=rep(0, 4))
   plot.new()
   text(x=0.5, y=0.5, cex = 1.50,
-       paste("Top 60 =Most Popular Words in", subCat, "Category"))
+       paste("Top 60 Most Popular Words in", subCat, "Category"))
   myTknCld <- myTkn %>%
     count(word) %>%
     with(wordcloud::wordcloud(word, n, max.words = 60,
@@ -431,7 +435,7 @@ Kik$kikNmTknPlot <- Kik$kikNmTkn %>%
 Kik$tknRank100 <- cbind(Kik$kikNmTknPlot[1:100,], rank = 1:100)
 
 #Main Category Freq Table FX
-Kik$tknRankMain <- function(mainCat, currency) {
+Kik$tknRankMainFx <- function(mainCat, currency) {
   myMainCat <- mainCat
   myCurrency <- currency
   
@@ -453,9 +457,9 @@ Kik$tknRankMain <- function(mainCat, currency) {
 #Main Category
 Kik$tknFxRank <- function(mainCat, baseCurr, curr2) {
   
-  myBaseCurr <- Kik$tknRankMain(mainCat, baseCurr)[1:100,1] %>%
+  myBaseCurr <- Kik$tknRankMainFx(mainCat, baseCurr)[1:100,1] %>%
     cbind(., 1:100)
-  myCurr2 <- Kik$tknRankMain(mainCat, curr2)[1:100,1] %>%
+  myCurr2 <- Kik$tknRankMainFx(mainCat, curr2)[1:100,1] %>%
     cbind(., 1:100)
   
   #Words found only in base currency
@@ -583,6 +587,8 @@ Kik$mainCatPlot <- function(mainCategory) {
 }
 
 Kik$mainCatPlotInput <- data.frame(mainCategory = unique(Kik$kiksrt$main_category))
+Kik$mainCatPlotInput <- arrange(Kik$mainCatPlotInput, -desc(mainCategory))
+
 #as.Character for dplyr::filter
 Kik$mainCatPlotInput$mainCategory <- as.character(Kik$mainCatPlotInput$mainCategory)
 #Kik$mainCatPlotOutput <- pmap(Kik$mainCatPlotInput, Kik$mainCatPlot)
