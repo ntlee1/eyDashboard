@@ -27,6 +27,18 @@ Shy$plotColsEy <- list(theme(plot.background = element_rect(fill = "#1C2134"),
                              legend.background = element_rect(fill = "#1C2134"),
                              legend.text = element_text(color = "white")))
 
+#Standard ggplot theme
+Kik$ggAutoTheme <- list(theme(plot.title = element_text(hjust = 0.5,
+                                                        size = 28,
+                                                        margin = margin(t = 16,
+                                                                        b = 16)),
+                              text = element_text(size = 24),
+                              axis.title.y = element_text(margin = margin(r = 16,
+                                                                          l = 16)),
+                              axis.title.x = element_text(margin = margin(t = 16,
+                                                                          b = 16))))
+
+
 #Cleanse and Check Each Column for Errors --------------------------------------
 #NAs ---------------------------------------------------------------------------
 #name, usd_pledged have NAs.
@@ -303,12 +315,13 @@ Kik$charPlot <-
                                  size == "Prem", state == "successful"),
             aes(x = charCt, colour = size),
             stat = "bin", size = 1) +
-  xlab("Kickstarter Name Length (characters)") +
-  ylab("Number of Kickstarter Projects") +
-  labs(title = "Length of Successful Kickstarter Campaign Names by Size") +
+  xlab("Campaign Name Length (characters)") +
+  ylab("Number of Projects") +
+  labs(title = "Name Length of Successful Campaigns") +
+  Kik$ggAutoTheme +
   theme(plot.title = element_text(hjust = 0.5)) +
   Shy$plotColsEy +
-  scale_colour_discrete()
+  scale_colour_discrete(name = "Campaign Size")
 Kik$charPlot
 
 #What words are associated with each category? ---------------------------------
@@ -559,14 +572,18 @@ Kik$timelineStCt <- dplyr::filter(Kik$timeline, state == c("successful", "failed
 
 Kik$timelineStCtPlot <-  Kik$timelineStCt %>%
   ggplot2::ggplot(., aes(x = launchYear, y = `n()`, fill = state)) +
-  geom_col(position = "dodge") +
-  scale_fill_discrete(name = "State", labels = c("Successful", "Failed")) +
+  geom_col(position = "dodge", color = "#222A35") +
+  scale_fill_manual(values = c(failed = "red", successful = "green"),
+                    labels = c("Failed", "Successful"),
+                    name = "State") +
   xlab("Year") +
   ylab("Number of Kickstarter Campaigns") +
   labs(title = "Kickstarter Campaigns Launched by Year") +
-  theme(plot.title = element_text(hjust = 0.5)) +
+  Kik$ggAutoTheme +
   Shy$plotColsEy +
   scale_y_continuous(breaks = seq(from = 0, to = 25000, by = 2500))
+
+
 
 
 #Breakdown of Number of Projects per Category ----------------------------------
@@ -585,15 +602,20 @@ Kik$mainCatPlot <- function(mainCategory) {
                                   !category == myMainCategory) %>%
     ggplot2::ggplot(., aes(x = reorder(category, -`n()`), y = `n()`,
                            fill = category)) +
-    geom_col(position = "stack") +
-    theme(axis.text.x = element_text(angle = 90),
-          plot.title = element_text(hjust = 0.5)) +
+    geom_col(position = "stack", fill = "#FFE700", color = "#222A35") +
+    coord_flip() +
+    Kik$ggAutoTheme +
     Shy$plotColsEy +
+    theme(axis.text.x = element_text(angle = 90,
+                                     vjust = 0.2),
+          plot.title = element_text(hjust = 0.5),
+          legend.position = "none",
+          plot.margin = margin(r = 29)) +
+
     xlab(paste(myMainCategory, "Subcategory")) +
     ylab("Count") +
     labs(title = paste("Number of Campaigns in", myMainCategory,
-                       "Subcategories 2009-2018")) +
-    scale_fill_discrete()
+                       "Subcategories 2009-2018"))
   
   mySubcatPlot
 }
@@ -695,15 +717,20 @@ Kik$partialFailPlot <- function(size) {
   colnames(myCut) <- c("Breaks", "Count")
   
   myPlot <- ggplot2::ggplot(myCut, aes(x = Breaks, y = Count, fill = Breaks)) +
-    geom_histogram(stat = "identity") +
-    theme(axis.text.x = element_text(angle = 90),
-          plot.title = element_text(hjust = 0.5)) +
+    geom_histogram(stat = "identity", fill = "#FFE700", color = "#222A35") +
+    coord_flip() +
+    theme(axis.text.x = element_text(angle = 90,
+                                     size = 16),
+          axis.text.y = element_text(size = 16),
+          plot.title = element_text(hjust = 0.5,
+                                    size = 28),
+          legend.position = "none",
+          axis.title.x = element_text(size = 24),
+          axis.title.y = element_text(size = 24)) +
     Shy$plotColsEy +
-    scale_fill_discrete() +
-    xlab("Percent Breaks") +
+    xlab("Percent Bins (%)") +
     ylab("Number of Kickstarter Campaigns") +
-    labs(title = paste("Percent of Goal Amount Raised for", mySize,
-                       "Failed Projects"))
+    labs(title = paste("Percent of Goal Reached:", "Failed", mySize, "Campaigns"))
   return(myPlot)
 }
 

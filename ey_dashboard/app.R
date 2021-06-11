@@ -2,6 +2,7 @@ library(shiny)
 library(shinyalert)
 library(here)
 library(shinyWidgets)
+library(rsconnect)
 
 eyYellow <- "color: #FFE700;"
 tabTitle <- "color: white"
@@ -10,13 +11,17 @@ Shy <- new.env()
 
 ui <- fluidPage(
   #Welcome Popup
-  #test <- modalDialog(includeHTML(here::here("html","welcome.html"))),
+ # modalDialog(includeHTML(here::here("html","welcome.html"))),
 
   shinyWidgets::setBackgroundColor("#1C2134"),
-  tags$style(HTML(".tabbable > .nav  > li > a:link {background-color:#1C2134}")),
-
-
-
+  tags$style(HTML(".tabbable > .nav  > li > a:link {background-color:#222A35}")),
+  tags$style(HTML(".col-sm-4 {background-color: #222A35}")),
+  tags$style(HTML(".navbar-brand {color: #FFFFFF")),
+  tags$style(HTML(".col-sm-4 > .nav > li > a:hover a:active {color: #FFFFFF; background-color: red}")), 
+  tags$style(HTML(".container-fluid {margin-left: 25px;
+                  margin-right: 25px}")),
+  
+  
 
   headerPanel(list(img(src = "eyLogo.png",
                        height = 135,
@@ -24,7 +29,7 @@ ui <- fluidPage(
                        style = "vertical-align: bottom;"))),
   
   sidebarLayout(
-    navlistPanel("KICKSTARTER PREDICTOR",
+    navlistPanel("KICKSTARTER PREDICTOR", widths = c(4,8),
                  tabPanel("Walkthrough",
                           htmlOutput("introVid")),
                  tabPanel("General Summary",
@@ -94,7 +99,10 @@ ui <- fluidPage(
                                      div(tableOutput("FXTable"),
                                      style = tabTitle))
                           )
-                 )
+                 ),
+                 tabPanel("About",
+                          div(textOutput("aboutMe"),
+                          style = tabTitle))
     ),
     mainPanel(
       
@@ -110,7 +118,8 @@ server <- function(input, output, session) {
   
   #Campaign Name Analysis --------------------------------------------------------
 
-  
+  output$aboutMe <- renderText("Hello")
+ 
   
   
   #Top 100 Words Overall

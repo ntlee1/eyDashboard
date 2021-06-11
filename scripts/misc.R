@@ -299,6 +299,26 @@ colnames(Kik$goalFunSeqData) <- c("BackerAvgPledge", "BackerAvgCount", "GoalAmou
 
 
 
+test <- function(mainCat) {
+  myMainCat <- mainCat
+  
+  myTkn <- dplyr::filter(Kik$kiksrt,
+                         main_category == myMainCat, state == "successful",
+                         currency == "SGD")
+  myTkn <- dplyr::tibble(name = myTkn$name) %>%
+    tidytext::unnest_tokens(., word, name) 
+  myTkn <- myTkn %>%
+    dplyr::anti_join(Kik$customStopWords)
+  
+  myTknTable <- myTkn %>%
+    dplyr::count(word, sort = TRUE)
+  myTknTable <- myTknTable[1:100,]
+  return(myTknTable)
+  
+}
+test("Food")
+
+Kik$tknFxRank("Art", "SGD", "NOK")
 
 
 
@@ -312,12 +332,7 @@ colnames(Kik$goalFunSeqData) <- c("BackerAvgPledge", "BackerAvgCount", "GoalAmou
 
 
 
-
-
-
-
-
-
+Kik$mainCatPlot("Food")
 
 
 
