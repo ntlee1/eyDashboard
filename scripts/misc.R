@@ -1,4 +1,4 @@
-#Old code ----------------------------------------------------------------------
+#Code I may use. Please ignore--------------------------------------------------
 #Not having to use literal deparse substitute
 myCatNms <- data.frame(x = catNms)
 myCatNms$x <- as.character(myCatNms$x)
@@ -297,7 +297,7 @@ colnames(Kik$goalFunSeqData) <- c("BackerAvgPledge", "BackerAvgCount", "GoalAmou
 
 
 
-
+0
 
 test <- function(mainCat) {
   myMainCat <- mainCat
@@ -328,11 +328,6 @@ Kik$tknFxRank("Art", "SGD", "NOK")
 
 
 
-
-
-
-
-Kik$mainCatPlot("Food")
 
 
 

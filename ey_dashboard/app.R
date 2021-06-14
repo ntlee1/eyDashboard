@@ -4,29 +4,25 @@ library(here)
 library(shinyWidgets)
 library(rsconnect)
 
-eyYellow <- "color: #FFE700;"
-tabTitle <- "color: white"
-Shy <- new.env()
+#Palette
+Shy$eyYellow <- "color: #FFE700;"
+Shy$palWhite <- "color: white"
 
 
 ui <- fluidPage(
-  #Welcome Popup
- # modalDialog(includeHTML(here::here("html","welcome.html"))),
-
+  # modalDialog(includeHTML(here::here("html","welcome.html"))),
+  
   shinyWidgets::setBackgroundColor("#1C2134"),
+  tags$style(HTML(" *{border-style: none !important}")),
   tags$style(HTML(".tabbable > .nav  > li > a:link {background-color:#222A35}")),
   tags$style(HTML(".col-sm-4 {background-color: #222A35}")),
   tags$style(HTML(".navbar-brand {color: #FFFFFF")),
-  tags$style(HTML(".col-sm-4 > .nav > li > a:hover a:active {color: #FFFFFF; background-color: red}")), 
   tags$style(HTML(".container-fluid {margin-left: 25px;
                   margin-right: 25px}")),
-  
-  
 
-  headerPanel(list(img(src = "eyLogo.png",
-                       height = 135,
-                       width = 240,
-                       style = "vertical-align: bottom;"))),
+  
+  titlePanel(list(img(src = "eyLogo.png",
+                       height = 135))),
   
   sidebarLayout(
     navlistPanel("KICKSTARTER PREDICTOR", widths = c(4,8),
@@ -35,23 +31,24 @@ ui <- fluidPage(
                  tabPanel("General Summary",
                           tabsetPanel(
                             tabPanel(div("New Campaign Timeline",
-                                     style = eyYellow),
+                                         style = Shy$eyYellow),
+                                     actionButton("btnTimeline", label = "Click for Analysis", icon = icon("question-circle")),
                                      plotOutput("myTimeline"),
                                      selectInput("mainCatPlot",
                                                  div("Select Main Category",
-                                                 style = tabTitle),
-                                                 choices = c(Kik$mainCatPlotInput$mainCategory),
+                                                     style = Shy$palWhite),
+                                                 choices = Kik$mainCatPlotInput$mainCategory,
                                                  selected = "Art"),
-                                     plotOutput("myPlot")),
+                                     plotOutput("campaignCountCat")),
                             tabPanel(div("Funds Ratio",
-                                     style = eyYellow),
+                                         style = Shy$eyYellow),
                                      div(tableOutput("myFundsRatio"),
-                                     style = tabTitle)),
+                                         style = Shy$palWhite)),
                             tabPanel(div("Partial Funds",
-                                     style = eyYellow),
+                                         style = Shy$eyYellow),
                                      selectInput("partialPlot",
                                                  div("Select Size",
-                                                 style = tabTitle),
+                                                     style = Shy$palWhite),
                                                  choices = c("Small",
                                                              "Mid",
                                                              "Large",
@@ -62,149 +59,99 @@ ui <- fluidPage(
                  ),
                  tabPanel("Campaign Name Analysis",
                           tabsetPanel(id = "tabsetHere",
-                            tabPanel(div("Name Length",
-                                     style = eyYellow),
-                                     plotOutput("myCharPlot")),
-                            tabPanel(div("Top Words Overall",
-                                     style = eyYellow),
-                                     div(tableOutput("kikNmAllOut"),
-                                     style = tabTitle)),
-                            tabPanel(div("Most Popular Words Main Category",
-                                     style = eyYellow),
-                                     plotOutput("nmTknMainPlotOut"),
-                                     selectInput("tknRankMain",
-                                                 div("Select Main Category",
-                                                 style = tabTitle),
-                                                 choices = unique(Kik$kiksrt$main_category),
-                                                 selected = "Art"),
-                                     div(tableOutput("tknRankMainTable"),
-                                     style = tabTitle)),
-                            tabPanel(div("Main Category FX Rank",
-                                     style = eyYellow),
-                                     selectInput("FX",
-                                                 div("Select Base Currency",
-                                                 style = tabTitle),
-                                                 choices = unique(Kik$kiksrt$currency),
-                                                 selected = "USD"),
-                                     selectInput("FX2",
-                                                 div("Select Compare Currency",
-                                                 style = tabTitle),
-                                                 choices = unique(Kik$kiksrt$currency),
-                                                 selected = "GBP"),
-                                     selectInput("FXCat",
-                                                 div("Select Main Category",
-                                                 style = tabTitle),
-                                                 choices = unique(Kik$kiksrt$main_category),
-                                                 selected = "Art"),
-                                     div(tableOutput("FXTable"),
-                                     style = tabTitle))
+                                      tabPanel(div("Name Length",
+                                                   style = Shy$eyYellow),
+                                               plotOutput("myCharPlot")),
+                                      tabPanel(div("Most Popular Words Main Category",
+                                                   style = Shy$eyYellow),
+                                               plotOutput("nmTknMainPlotOut"),
+                                               selectInput("tknRankMain",
+                                                           div("Select Main Category",
+                                                               style = Shy$palWhite),
+                                                           choices = c(Kik$tknCatInput$mainCategory),
+                                                           selected = "Art"),
+                                               div(tableOutput("tknRankMainTable"),
+                                                   style = Shy$palWhite)),
+                                      tabPanel(div("Main Category FX Rank",
+                                                   style = Shy$eyYellow),
+                                               selectInput("fx",
+                                                           div("Select Base Currency",
+                                                               style = Shy$palWhite),
+                                                           choices = Kik$tknFxRankInput$currency,
+                                                           selected = "USD"),
+                                               selectInput("fx2",
+                                                           div("Select Compare Currency",
+                                                               style = Shy$palWhite),
+                                                           choices = Kik$tknFxRankInput$currency,
+                                                           selected = "GBP"),
+                                               selectInput("fxCat",
+                                                           div("Select Main Category",
+                                                               style = Shy$palWhite),
+                                                           choices = unique(Kik$tknFxRankInputCat$mainCategory),
+                                                           selected = "Art"),
+                                               div(tableOutput("fxTable"),
+                                                   style = Shy$palWhite))
                           )
                  ),
                  tabPanel("About",
                           div(textOutput("aboutMe"),
-                          style = tabTitle))
+                              style = Shy$palWhite))
     ),
     mainPanel(
-      
-      
-      
     )
   )
 )
 
 server <- function(input, output, session) {
   #showModal(test)
-
   
-  #Campaign Name Analysis --------------------------------------------------------
-
   output$aboutMe <- renderText("Hello")
- 
+  output$myFundsRatio <- renderTable(Kik$catRatioResults)
+  output$myTimeline <- renderPlot(Kik$timelineStCtPlot)
+  output$myCharPlot <- renderPlot(Kik$charPlot)
+  
+  observeEvent(input$btnTimeline, {
+    showModal(modalDialog(includeHTML(here::here("html","welcome.html"))))
+  })
   
   
-  #Top 100 Words Overall
-  output$kikNmAllOut <- renderTable(Kik$kikNmAll)
-  
-  #Top 100 Words Main Category
   output$tknRankMainTable <- renderTable({
-    input1 <- reactive({input$tknRankMain})
-    myPlot <- Kik$tknRankMain(input1())
-    myPlot
-  })
-  #wc
-  output$nmTknMainPlotOut <-renderPlot({
-    myCat <- reactive({input$tknRankMain})
-    
-    myPlot <- Kik$nmTknMainPlot(mainCat = myCat())
-    myPlot
+    input1 <- input$tknRankMain
+    Kik$tknRankMain(input1)
   })
   
-  #Main Cat FX Rank
-  output$FXTable <- renderTable({
-    myFx1 <- reactive({input$FX})
-    myFx2 <- reactive({input$FX2})
-    myCat <- reactive({input$FXCat}) 
+  output$nmTknMainPlotOut <-renderPlot({
+    myCat <- input$tknRankMain
+    Kik$nmTknMainPlot(mainCat = myCat)
+  })
+  
+  output$fxTable <- renderTable({
+    myFx1 <- input$fx
+    myFx2 <- input$fx2
+    myCat <- input$fxCat 
     
-    myTable <- Kik$tknFxRank(mainCat = myCat(), baseCurr = myFx1(), curr2 = myFx2())
+    myTable <- Kik$tknFxRank(mainCat = myCat, baseCurr = myFx1, curr2 = myFx2)
     myTable
   })
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  output$myCharPlot <- renderPlot(Kik$charPlot)
-  
   output$partialFundPlot <- renderPlot({
-    switch(input$partialPlot,
-           "Small" = Kik$partialFailPlot("Small"),
-           "Mid" = Kik$partialFailPlot("Mid"),
-           "Large" = Kik$partialFailPlot("Large"),
-           "Prem" = Kik$partialFailPlot("Prem"))
+    inputPlot <- input$partialPlot
+    Kik$partialFailPlot(inputPlot)
+    
   })
-  
-  output$myFundsRatio <- renderTable(Kik$catRatioResults)
-  
-  output$myTimeline <- renderPlot(Kik$timelineStCtPlot)
   
   output$introVid <- renderUI({
     tags$iframe(src = "https://www.youtube.com/embed/hfPnq3i4Udw",
                 width = 600, height = 400)
   })
   
-  
-  #EDIT Plotly in viewer pane not
-  #EDIT Fix order
-  output$myPlot <- renderPlot({
-    switch(input$mainCatPlot, 
-           "Food" = Kik$mainCatPlot("Food"),
-           "Music" = Kik$mainCatPlot("Music"),
-           "Comics" = Kik$mainCatPlot("Comics"),
-           "Design" = Kik$mainCatPlot("Design"),
-           "Art" = Kik$mainCatPlot("Art"),
-           "Fashion" = Kik$mainCatPlot("Fashion"),
-           "Film & Video" = Kik$mainCatPlot("Film & Video"),
-           "Publishing" = Kik$mainCatPlot("Publishing"),
-           "Technology" = Kik$mainCatPlot("Technology"),
-           "Games" = Kik$mainCatPlot("Games"),
-           "Photography" = Kik$mainCatPlot("Photography"),
-           "Dance" = Kik$mainCatPlot("Dance"),
-           "Crafts" = Kik$mainCatPlot("Crafts"),
-           "Journalism" = Kik$mainCatPlot("Journalism"),
-           "Theater" = Kik$mainCatPlot("Theater"))
+  output$campaignCountCat <- renderPlot({
+    inputPlot <- input$mainCatPlot
+    Kik$mainCatPlot(inputPlot)
   })
-  
-  
 }
 
 shinyApp(ui, server)
-
-
 
 
 
