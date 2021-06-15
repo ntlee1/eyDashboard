@@ -25,6 +25,11 @@ Init$pkgReq <- c("tidyverse",
                  "rlang")
 lapply(Init$pkgReq, require, character.only = TRUE)
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
 
 
 
