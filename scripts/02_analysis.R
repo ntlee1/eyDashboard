@@ -3,11 +3,11 @@
 Kik <- new.env()
 #For Shiny 
 Shy <- new.env()
+#Shiny Palette
+Shy$palBkGround <- "#1C2134"
 
 #TOPIC: WRANGLE ################################################################
 #Import Data -------------------------------------------------------------------
-#Note: state == c(live, suspended, canceled) are mostly ignored in this analysis. 
-#These ambiguous outcomes are generally not insightful
 Kik$pathKikData <- here::here("data", "Kickstarter Data","ksprojects.csv")
 Kik$kiksrt <- readr::read_csv(Kik$pathKikData) %>%
   as_tibble
@@ -24,10 +24,10 @@ Kik$kiksrt[, Kik$colFct] <- lapply(Kik$kiksrt[, Kik$colFct],
 #Shiny UI Plot Modifications 
 #Weird white line shows up on bottom of plot. 
 #Plot border specified as background color
-Shy$plotColsEy <- list(theme(plot.background = element_rect(fill = "#1C2134", 
-                                                            colour = "#1C2134",
+Shy$plotColsEy <- list(theme(plot.background = element_rect(fill = Shy$palBkGround, 
+                                                            colour = Shy$palBkGround,
                                                             size = 0),
-                             legend.background = element_rect(fill = "#1C2134"),
+                             legend.background = element_rect(fill = Shy$palBkGround),
                              text = element_text(color = "white"),
                              axis.text = element_text(color = "white"),
                              legend.text = element_text(color = "white")))
@@ -213,6 +213,11 @@ Kik$kiksrt[10000 <= Kik$kiksrt$usd_goal_real, "size"] <- "Prem"
 dplyr::filter(Kik$kiksrt, size == "empty")
 Kik$kiksrt$size <- factor(Kik$kiksrt$size,
                           levels = c("Small", "Mid", "Large", "Prem"))
+Kik$sizeExplain <- data.frame(comment = c("Small projects goal range is $0-1299",
+                     "Mid projects goal range is $1300-3839",
+                     "Large projects goal range is $3840-9999",
+                     "Prem projects goal range is $10000+"))
+Kik$sizeExplain$size <- levels(Kik$kiksrt$size)
 
 #Add Time Length of Campaign ---------------------------------------------------
 Kik$kiksrt$projLen <- (Kik$kiksrt$deadline - Kik$kiksrt$launched) %>%
@@ -261,6 +266,11 @@ Kik$brkout <- rbind(Kik$brkoutSm,
                     Kik$brkoutLg,
                     Kik$brkoutPrem) %>%
   as.data.frame
+
+#Useful vars for analysis ------------------------------------------------------
+#Note: state == c(live, suspended, canceled) are mostly ignored in this analysis. 
+#These ambiguous outcomes are generally not insightful
+Kik$kiksrtSuccFail <- dplyr::filter(Kik$kiksrt, state == "successful" | state == "failed")
 
 #TOPIC: NAME ANALYSIS ##########################################################
 #Determine the optimal name characteristics for a campaign.
@@ -599,59 +609,140 @@ Kik$timeline <- Kik$kiksrt
 Kik$timeline$launchYear <- lubridate::year(Kik$timeline$launched) %>%
   as.factor()
 
-Kik$timelineStCt <- dplyr::filter(Kik$timeline, state == c("successful", "failed")) %>%
-  dplyr::group_by(state, launchYear) %>%
-  summarise(n())
+Kik$timelineStCtInput <- data.frame(kikSize = c(1:5))
+Kik$timelineStCtInput$kikSize[1] <- "All Projects"
+Kik$timelineStCtInput$kikSize[2:5] <- levels(Kik$kiksrt$size) %>%
+  as.character
 
-Kik$timelineStCtPlot <-  Kik$timelineStCt %>%
-  ggplot2::ggplot(., aes(x = launchYear, y = `n()`, fill = state)) +
-  geom_col(position = "dodge", color = "#222A35") +
-  scale_fill_manual(values = c(failed = "red", successful = "green"),
-                    labels = c("Failed", "Successful"),
-                    name = "State") +
-  xlab("Year") +
-  ylab("Number of Kickstarter Campaigns") +
-  labs(title = "Kickstarter Campaigns Launched by Year") +
-  Kik$ggAutoTheme +
-  Shy$plotColsEy +
-  scale_y_continuous(breaks = seq(from = 0, to = 25000, by = 2500))
+
+Kik$timelineStCtPlot <- function(kikSize) {
+  if(kikSize == "All Projects") {
+    
+    Kik$timelineStCt <- dplyr::filter(Kik$timeline, state == c("successful", "failed")) %>%
+      dplyr::group_by(state, launchYear) %>%
+      summarise(n())
+    
+    myPlot <-  Kik$timelineStCt %>%
+      ggplot2::ggplot(., aes(x = launchYear, y = `n()`, fill = state)) +
+      geom_col(position = "dodge", color = "#222A35") +
+      scale_fill_manual(values = c(failed = "red", successful = "green"),
+                        labels = c("Failed", "Successful"),
+                        name = "State") +
+      xlab("Year") +
+      ylab("Number of Kickstarter Campaigns") +
+      labs(title = "All Kickstarter Campaigns Launched by Year") +
+      Kik$ggAutoTheme +
+      Shy$plotColsEy
+    
+    return(myPlot)
+  } else {
+    mySize <- kikSize
+    #mySubtitle <- dplyr::filter(Kik$sizeExplain, size == kikSize)[1,1]
+    
+    Kik$timelineStCt <- dplyr::filter(Kik$timeline,
+                                      state == c("successful", "failed"),
+                                      size == mySize) %>%
+      dplyr::group_by(state, launchYear) %>%
+      summarise(n())
+    
+    myPlot <- Kik$timelineStCt %>%
+      ggplot2::ggplot(., aes(x = launchYear, y = `n()`, fill = state)) +
+      geom_col(position = "dodge", color = "#222A35") +
+      Kik$ggAutoTheme +
+      Shy$plotColsEy +
+      scale_fill_manual(values = c(failed = "red", successful = "green"),
+                        labels = c("Failed", "Successful"),
+                        name = "Campaign State") +
+      xlab("Year") +
+      ylab("Number of Kickstarter Campaigns") +
+      labs(title = paste(mySize, "Kickstarter Campaigns Launched by Year")) +
+      theme(plot.subtitle = element_text(size = 20, hjust = 0.5,
+                                         margin = margin(b = 15)))
+    
+    return(myPlot)
+  }
+}
+
+
+
 
 #Breakdown of Number of Projects per Category ----------------------------------
-Kik$catSmry <- dplyr::filter(Kik$kiksrt, state == "successful" | state == "failed") 
-Kik$catSmry$category <- as.factor(Kik$catSmry$category)
-Kik$catSmry$main_category <- as.factor(Kik$catSmry$main_category)
-Kik$catSmryCount <- Kik$catSmry %>%
-  dplyr::group_by(main_category, category) %>%
-  summarise(n()) 
+Kik$catSmry <- Kik$kiksrtSuccFail
 
 #Plot all Main categories
-Kik$mainCatPlot <- function(mainCategory) {
-  myMainCategory <- mainCategory
-  mySubcatPlot <- dplyr::filter(Kik$catSmryCount,
-                                main_category == myMainCategory &
-                                  !category == myMainCategory) %>%
-    ggplot2::ggplot(., aes(x = reorder(category, -`n()`), y = `n()`,
-                           fill = category)) +
-    geom_col(position = "stack", fill = "#FFE700", color = "#222A35") +
-    coord_flip() +
-    Kik$ggAutoTheme +
-    Shy$plotColsEy +
-    theme(axis.text.x = element_text(angle = 90,
-                                     vjust = 0.2),
-          plot.title = element_text(hjust = 0.5),
-          legend.position = "none",
-          plot.margin = margin(r = 29)) +
-
-    xlab(paste(myMainCategory, "Subcategory")) +
-    ylab("Count") +
-    labs(title = paste("Number of Campaigns in", myMainCategory,
-                       "Subcategories 2009-2018"))
-  
-  mySubcatPlot
+Kik$mainCatPlot <- function(mainCategory, kikSize) {
+  if(kikSize == "All Sizes") {
+    myMainCategory <- mainCategory
+    
+    mySubcatPlot <- Kik$catSmry %>%
+      dplyr::group_by(main_category, category, state) %>%
+      summarise(n()) %>%
+      dplyr::filter(.,
+                    main_category == myMainCategory &
+                      !category == myMainCategory) %>%
+      ggplot2::ggplot(., aes(x = reorder(category, -`n()`), y = `n()`,
+                             fill = state)) +
+      geom_col(position = "stack") +
+      scale_fill_manual(values = c(successful = "green", failed = "red"),
+                        labels = c("Failed", "Successful"),
+                        name = "Campaign State") +
+      coord_flip() +
+      Kik$ggAutoTheme +
+      Shy$plotColsEy +
+      theme(axis.text.x = element_text(angle = 90,
+                                       vjust = 0.2),
+            plot.title = element_text(hjust = 0.5),
+            plot.margin = margin(r = 29)) +
+      
+      xlab(paste(myMainCategory, "Subcategory")) +
+      ylab("Count") +
+      labs(title = paste("Number of Campaigns in", myMainCategory,
+                         "Subcategories 2009-2018"))
+    
+    return(mySubcatPlot)
+  } else {
+    myMainCategory <- mainCategory
+    mySize <- kikSize
+    
+    mySubcatPlot <- Kik$catSmry %>%
+      dplyr::filter(., size == mySize) %>%
+      dplyr::group_by(main_category, category, state) %>%
+      summarise(n()) %>%
+      dplyr::filter(.,
+                    main_category == myMainCategory &
+                      !category == myMainCategory) %>%
+      ggplot2::ggplot(., aes(x = reorder(category, -`n()`), y = `n()`,
+                             fill = state)) +
+      geom_col(position = "stack") +
+      scale_fill_manual(values = c(successful = "green", failed = "red"),
+                        labels = c("Failed", "Successful"),
+                        name = "Campaign State") +
+      coord_flip() +
+      Kik$ggAutoTheme +
+      Shy$plotColsEy +
+      theme(axis.text.x = element_text(angle = 90,
+                                       vjust = 0.2),
+            plot.title = element_text(hjust = 0.5),
+            plot.margin = margin(r = 29)) +
+      
+      xlab(paste(myMainCategory, "Subcategory")) +
+      ylab("Count") +
+      labs(title = paste("Number of", mySize, "Campaigns Launched in", myMainCategory,
+                         "Subcategories 2009-2018"))
+    
+    return(mySubcatPlot)
+  }
 }
+
+
 
 Kik$mainCatPlotInput <- data.frame(mainCategory = unique(Kik$kiksrt$main_category))
 Kik$mainCatPlotInput <- arrange(Kik$mainCatPlotInput, -desc(mainCategory))
+
+Kik$mainCatPlotInputSz <- data.frame(kikSize = c(1:5))
+Kik$mainCatPlotInputSz$kikSize[1] <- "All Sizes"
+Kik$mainCatPlotInputSz$kikSize[2:5] <- levels(Kik$kiksrt$size) %>%
+  as.character
 
 #Must convert fct to char for pmap to input valid argument to Kik$mainCatPlot
 #Kik$mainCatPlotInput$mainCategory <- as.character(Kik$mainCatPlotInput$mainCategory)

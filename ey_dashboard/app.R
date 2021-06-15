@@ -5,12 +5,13 @@ library(shinyWidgets)
 library(rsconnect)
 
 #Palette
-Shy$eyYellow <- "color: #FFE700;"
+#More colors on 02_analysis
+Shy$palEyYellow <- "color: #FFE700;"
 Shy$palWhite <- "color: white"
 
-
 ui <- fluidPage(
-  # modalDialog(includeHTML(here::here("html","welcome.html"))),
+   #modalDialog(includeHTML(here::here("html","welcome.html")),
+    #           easyClose = TRUE),
   
   shinyWidgets::setBackgroundColor("#1C2134"),
   tags$style(HTML(" *{border-style: none !important}")),
@@ -19,6 +20,8 @@ ui <- fluidPage(
   tags$style(HTML(".navbar-brand {color: #FFFFFF")),
   tags$style(HTML(".container-fluid {margin-left: 25px;
                   margin-right: 25px}")),
+  tags$style(HTML(".btn {color: blue;
+                  margin: 15px 0}")),
 
   
   titlePanel(list(img(src = "eyLogo.png",
@@ -31,21 +34,32 @@ ui <- fluidPage(
                  tabPanel("General Summary",
                           tabsetPanel(
                             tabPanel(div("New Campaign Timeline",
-                                         style = Shy$eyYellow),
-                                     actionButton("btnTimeline", label = "Click for Analysis", icon = icon("question-circle")),
+                                         style = Shy$palEyYellow),
+                                     (actionButton("btnTimeline", label = "Click for Analysis",
+                                                   icon = icon("question-circle"))),
+                                     selectInput("timelineIn",
+                                                 div("Select Project Size",
+                                                 style = Shy$palWhite),
+                                                 choices = Kik$timelineStCtInput$kikSize,
+                                                 selected = "Small"),
                                      plotOutput("myTimeline"),
                                      selectInput("mainCatPlot",
                                                  div("Select Main Category",
                                                      style = Shy$palWhite),
                                                  choices = Kik$mainCatPlotInput$mainCategory,
                                                  selected = "Art"),
+                                     selectInput("mainCatPlotSz",
+                                                 div("Select Project Size",
+                                                     style = Shy$palWhite),
+                                                 choices = Kik$mainCatPlotInputSz$kikSize,
+                                                 selected = "Small"),
                                      plotOutput("campaignCountCat")),
                             tabPanel(div("Funds Ratio",
-                                         style = Shy$eyYellow),
+                                         style = Shy$palEyYellow),
                                      div(tableOutput("myFundsRatio"),
                                          style = Shy$palWhite)),
                             tabPanel(div("Partial Funds",
-                                         style = Shy$eyYellow),
+                                         style = Shy$palEyYellow),
                                      selectInput("partialPlot",
                                                  div("Select Size",
                                                      style = Shy$palWhite),
@@ -60,10 +74,10 @@ ui <- fluidPage(
                  tabPanel("Campaign Name Analysis",
                           tabsetPanel(id = "tabsetHere",
                                       tabPanel(div("Name Length",
-                                                   style = Shy$eyYellow),
+                                                   style = Shy$palEyYellow),
                                                plotOutput("myCharPlot")),
                                       tabPanel(div("Most Popular Words Main Category",
-                                                   style = Shy$eyYellow),
+                                                   style = Shy$palEyYellow),
                                                plotOutput("nmTknMainPlotOut"),
                                                selectInput("tknRankMain",
                                                            div("Select Main Category",
@@ -73,7 +87,7 @@ ui <- fluidPage(
                                                div(tableOutput("tknRankMainTable"),
                                                    style = Shy$palWhite)),
                                       tabPanel(div("Main Category FX Rank",
-                                                   style = Shy$eyYellow),
+                                                   style = Shy$palEyYellow),
                                                selectInput("fx",
                                                            div("Select Base Currency",
                                                                style = Shy$palWhite),
@@ -107,13 +121,17 @@ server <- function(input, output, session) {
   
   output$aboutMe <- renderText("Hello")
   output$myFundsRatio <- renderTable(Kik$catRatioResults)
-  output$myTimeline <- renderPlot(Kik$timelineStCtPlot)
   output$myCharPlot <- renderPlot(Kik$charPlot)
   
   observeEvent(input$btnTimeline, {
-    showModal(modalDialog(includeHTML(here::here("html","welcome.html"))))
+    showModal(modalDialog(includeHTML(here::here("html","welcome.html")), 
+                          easyClose = TRUE))
   })
   
+  output$myTimeline <- renderPlot({
+    input1 <- input$timelineIn
+    Kik$timelineStCtPlot(input1)
+  })
   
   output$tknRankMainTable <- renderTable({
     input1 <- input$tknRankMain
@@ -146,8 +164,9 @@ server <- function(input, output, session) {
   })
   
   output$campaignCountCat <- renderPlot({
-    inputPlot <- input$mainCatPlot
-    Kik$mainCatPlot(inputPlot)
+    myCat <- input$mainCatPlot
+    mySize <- input$mainCatPlotSz
+    Kik$mainCatPlot(mainCategory = myCat, kikSize = mySize)
   })
 }
 
