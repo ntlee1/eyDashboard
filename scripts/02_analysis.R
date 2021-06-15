@@ -90,7 +90,7 @@ Kik$kiksrt <- filter(Kik$kiksrt, !state == "undefined") %>%
 #Only ~3000 cases, trivial amount that wont impact overall analysis
 #Don't know why API did not include backers in these cases
 Kik$noBkr <- dplyr::filter(Kik$kiksrt, backers == 0 &
-                                0 < usd_pledged_real)
+                             0 < usd_pledged_real)
 Kik$kiksrt <- dplyr::filter(Kik$kiksrt, !(ID %in% Kik$noBkr$ID))
 
 #Check for duplicate rows. 0 found --------------------------------------------
@@ -214,9 +214,9 @@ dplyr::filter(Kik$kiksrt, size == "empty")
 Kik$kiksrt$size <- factor(Kik$kiksrt$size,
                           levels = c("Small", "Mid", "Large", "Prem"))
 Kik$sizeExplain <- data.frame(comment = c("Small projects goal range is $0-1299",
-                     "Mid projects goal range is $1300-3839",
-                     "Large projects goal range is $3840-9999",
-                     "Prem projects goal range is $10000+"))
+                                          "Mid projects goal range is $1300-3839",
+                                          "Large projects goal range is $3840-9999",
+                                          "Prem projects goal range is $10000+"))
 Kik$sizeExplain$size <- levels(Kik$kiksrt$size)
 
 #Add Time Length of Campaign ---------------------------------------------------
@@ -334,12 +334,12 @@ Kik$kikNmTkn <- tidytext::unnest_tokens(Kik$kikNm, word, name)
 Kik$kikNmTkn <- Kik$kikNmTkn %>%
   dplyr::anti_join(stop_words)
 Kik$kikNmTkn %>%
-dplyr::count(word, sort = TRUE)
+  dplyr::count(word, sort = TRUE)
 
 #Canceled projects have word "canceled in campaign name. Filtered out for redundancy. 
 Kik$customStopWords <- bind_rows(tibble(word = c("canceled"),
-                             lexicon = c("custom")),
-                      stop_words)
+                                        lexicon = c("custom")),
+                                 stop_words)
 Kik$kikNmTkn <- Kik$kikNmTkn %>%
   dplyr::anti_join(Kik$customStopWords)
 #Top 100 words overall include album, film, project
@@ -813,9 +813,9 @@ stats::median(Kik$kikPartialFailLarge$partialFail)
 
 #Prem
 Kik$kikPartialFailPrem <- dplyr::filter(Kik$kikPartialFail, size == "Prem",
-                                         !partialFail == 0)
+                                        !partialFail == 0)
 Kik$kikPartialFailPremZero <- dplyr::filter(Kik$kikPartialFail, size == "Prem", 
-                                             partialFail == 0)
+                                            partialFail == 0)
 #~72k Prem projects raised some money. ~15k Prem projects raised no money
 dplyr::count(Kik$kikPartialFailPrem)
 dplyr::count(Kik$kikPartialFailPremZero)

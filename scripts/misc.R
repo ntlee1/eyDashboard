@@ -55,6 +55,7 @@ Kik$kiksrt <- Kik$kiksrt[!duplicateinstd(Kik$kiksrt[,c("ID")]),]
 #TRUE
 length(Kik$kiksrt$ID) == length(unique(Kik$kiksrt$ID))
 
+
 #Name length recommender
 #Purpose: Give optimal project name length based on campaign goal
 #Appropriate linear model selected based on goal size
@@ -335,10 +336,50 @@ Kik$tknFxRank("Art", "SGD", "NOK")
 
 
 
+#Global vars will be reused often throughout scripts ---------------------------
+#Useful vars stored here for easy reference and reuse throughout project
+#Var: Filters
+Kik$kikSuccess <- dplyr::filter(Kik$kiksrt, state == "successful")
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+Kik$NmTknFun("Food")
+
+
+
+
+
+
+
+layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
+par(mar=rep(0, 4))
+plot.new()
+text(x=0.5, y=0.5, "Title of my first plot")
+
+
+Kik$NmTknMainPlotOutput[[1]]
+
+Kik$subCatPlotOutput[[1]]
+
+
+
+
+
+#Maybe a direct call is eaiser in shiny
+Kik$NmTknMainPlot("Food")
 
 
 

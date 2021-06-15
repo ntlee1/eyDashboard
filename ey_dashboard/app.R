@@ -10,8 +10,8 @@ Shy$palEyYellow <- "color: #FFE700;"
 Shy$palWhite <- "color: white"
 
 ui <- fluidPage(
-   #modalDialog(includeHTML(here::here("html","welcome.html")),
-    #           easyClose = TRUE),
+  #modalDialog(includeHTML(here::here("html","welcome.html")),
+  #           easyClose = TRUE),
   
   shinyWidgets::setBackgroundColor("#1C2134"),
   tags$style(HTML(" *{border-style: none !important}")),
@@ -22,10 +22,10 @@ ui <- fluidPage(
                   margin-right: 25px}")),
   tags$style(HTML(".btn {color: blue;
                   margin: 15px 0}")),
-
+  
   
   titlePanel(list(img(src = "eyLogo.png",
-                       height = 135))),
+                      height = 135))),
   
   sidebarLayout(
     navlistPanel("KICKSTARTER PREDICTOR", widths = c(4,8),
@@ -39,7 +39,7 @@ ui <- fluidPage(
                                                    icon = icon("question-circle"))),
                                      selectInput("timelineIn",
                                                  div("Select Project Size",
-                                                 style = Shy$palWhite),
+                                                     style = Shy$palWhite),
                                                  choices = Kik$timelineStCtInput$kikSize,
                                                  selected = "Small"),
                                      plotOutput("myTimeline"),
