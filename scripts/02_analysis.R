@@ -361,7 +361,11 @@ Kik$tknRankMain <- function(mainCat) {
       dplyr::count(word, sort = TRUE)
     myTknTable <- myTknTable[1:100,]
     colnames(myTknTable) <- c("Word", "Use Frequency")
+    myTknTable <- DT::datatable(myTknTable,
+                                caption = "Table 1: Top 100 Words by Frequency for All Categories")
+    
     return(myTknTable)
+    
   } else {
     myMainCat <- mainCat
     
@@ -376,6 +380,9 @@ Kik$tknRankMain <- function(mainCat) {
       dplyr::count(word, sort = TRUE)
     myTknTable <- myTknTable[1:100,]
     colnames(myTknTable) <- c("Word", "Use Frequency")
+    myTknTable <- DT::datatable(myTknTable,
+                                caption = paste("Table 1: Top 100 Words by Frequency For Category", myMainCat))
+    
     return(myTknTable)
   } 
 }
@@ -562,7 +569,10 @@ Kik$tknFxRank <- function(mainCat, baseCurr, curr2) {
   colnames(outFinal) <- c(paste(baseCurr),
                           paste(baseCurr, "Word Rank"),
                           paste(curr2, "Relative Rank"))
-  outFinal
+  outFinal <- DT::datatable(outFinal, 
+                caption = paste0("Table 1: ",baseCurr,"/",curr2, " Relative Word Rank Positions"))
+  
+  return(outFinal)
 }
 
 #Alphabetical inputs for shiny
@@ -598,8 +608,16 @@ Kik$catRatioResults <- pmap(Kik$mainCatRatioInput, Kik$mainCatRatio) %>%
   unlist %>%
   matrix(., nrow = 15, byrow = TRUE) %>%
   as.data.frame 
-colnames(Kik$catRatioResults) <- c("Main Category", "Total Funds Pledged Ratio")
-Kik$catRatioResults <- arrange(Kik$catRatioResults, desc(`Total Funds Pledged Ratio`))
+colnames(Kik$catRatioResults) <- c("Main Category", "Excess Funds Raised Multiple")
+
+Kik$catRatioResults <- arrange(Kik$catRatioResults, desc(`Excess Funds Raised Multiple`)) %>% 
+  DT::datatable(., options = list(
+  lengthMenu = FALSE),
+  caption = "Table 1: This Table Compares Aggregated Excess Funds Raised for All Projects in Each Category.",
+  class = "cell-border stripe"
+  )
+
+
 
 #TOPIC: SUMMARY STATS ##########################################################
 #Create yearly timeline of new projects ----------------------------------------
@@ -828,14 +846,13 @@ stats::median(Kik$kikPartialFailPrem$partialFail)
 Kik$partialFailPlot <- function(size) {
   mySize <- size
   myCut <- dplyr::filter(Kik$kikPartialFail, size == mySize)
-  myCut <- cut(myCut$partialFail, breaks = seq(0,1, by = 0.1)) %>%
+  myCut <- cut(myCut$partialFail*100, breaks = seq(0,100, by = 10)) %>%
     table %>%
     data.frame
   colnames(myCut) <- c("Breaks", "Count")
   
   myPlot <- ggplot2::ggplot(myCut, aes(x = Breaks, y = Count, fill = Breaks)) +
     geom_histogram(stat = "identity", fill = "#FFE700", color = "#222A35") +
-    coord_flip() +
     theme(axis.text.x = element_text(angle = 90,
                                      size = 16),
           axis.text.y = element_text(size = 16),
@@ -847,7 +864,8 @@ Kik$partialFailPlot <- function(size) {
     Shy$plotColsEy +
     xlab("Percent Bins (%)") +
     ylab("Number of Kickstarter Campaigns") +
-    labs(title = paste("Percent of Goal Reached:", "Failed", mySize, "Campaigns"))
+    labs(title = paste("Percent of Goal Reached:", "Failed", mySize, "Campaigns")) +
+    coord_flip() 
   return(myPlot)
 }
 

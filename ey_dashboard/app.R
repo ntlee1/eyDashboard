@@ -22,6 +22,28 @@ ui <- fluidPage(
                   margin-right: 25px}")),
   tags$style(HTML(".btn {color: blue;
                   margin: 15px 0}")),
+  #Funds Ratio 
+  tags$style(HTML("#DataTables_Table_0 > tbody > tr:nth-child(even) {background-color: #797878")),
+  tags$style(HTML("#DataTables_Table_0 > thead {background-color: #797878")),
+  tags$style(HTML("#DataTables_Table_0_filter {display: none}")),
+  tags$style(HTML("#DataTables_Table_0_length {display: none}")),
+  tags$style(HTML("#DataTables_Table_0 > caption {background-color: #FFE700;
+                  color: black; text-align: center}")),
+  tags$style(HTML("#DataTables_Table_0_info {color: white")),
+  tags$style(HTML("#DataTables_Table_0_paginate {background-color: white}")),
+  
+  #Word Cloud Table
+  tags$style(HTML(".datatables > .dataTables_wrapper > .display > tbody > tr:nth-child(even) {background-color: #797878")),
+  tags$style(HTML(".datatables > .dataTables_wrapper > .display > thead {background-color: #797878")),
+  tags$style(HTML(".dataTables_filter {display: none}")),
+  tags$style(HTML(".dataTables_length {display: none}")),
+  tags$style(HTML(".datatables > .dataTables_wrapper > .display > caption {background-color: #FFE700;
+                  color: black; text-align: center}")),
+  tags$style(HTML(".datatables > .dataTables_wrapper > .dataTables_info {color: white")),
+  tags$style(HTML(".datatables > .dataTables_wrapper > .dataTables_paginate {background-color: white}")),
+ 
+ 
+  
   
   
   titlePanel(list(img(src = "eyLogo.png",
@@ -56,8 +78,7 @@ ui <- fluidPage(
                                      plotOutput("campaignCountCat")),
                             tabPanel(div("Funds Ratio",
                                          style = Shy$palEyYellow),
-                                     div(tableOutput("myFundsRatio"),
-                                         style = Shy$palWhite)),
+                                     DT::DTOutput("myFundsRatio")),
                             tabPanel(div("Partial Funds",
                                          style = Shy$palEyYellow),
                                      selectInput("partialPlot",
@@ -73,9 +94,6 @@ ui <- fluidPage(
                  ),
                  tabPanel("Campaign Name Analysis",
                           tabsetPanel(id = "tabsetHere",
-                                      tabPanel(div("Name Length",
-                                                   style = Shy$palEyYellow),
-                                               plotOutput("myCharPlot")),
                                       tabPanel(div("Most Popular Words Main Category",
                                                    style = Shy$palEyYellow),
                                                plotOutput("nmTknMainPlotOut"),
@@ -84,7 +102,7 @@ ui <- fluidPage(
                                                                style = Shy$palWhite),
                                                            choices = c(Kik$tknCatInput$mainCategory),
                                                            selected = "Art"),
-                                               div(tableOutput("tknRankMainTable"),
+                                               div(DT::dataTableOutput("tknRankMainTable"),
                                                    style = Shy$palWhite)),
                                       tabPanel(div("Main Category FX Rank",
                                                    style = Shy$palEyYellow),
@@ -103,7 +121,7 @@ ui <- fluidPage(
                                                                style = Shy$palWhite),
                                                            choices = unique(Kik$tknFxRankInputCat$mainCategory),
                                                            selected = "Art"),
-                                               div(tableOutput("fxTable"),
+                                               div(DT::dataTableOutput("fxTable"),
                                                    style = Shy$palWhite))
                           )
                  ),
@@ -120,8 +138,7 @@ server <- function(input, output, session) {
   #showModal(test)
   
   output$aboutMe <- renderText("Hello")
-  output$myFundsRatio <- renderTable(Kik$catRatioResults)
-  output$myCharPlot <- renderPlot(Kik$charPlot)
+  output$myFundsRatio <- DT::renderDT(Kik$catRatioResults)
   
   observeEvent(input$btnTimeline, {
     showModal(modalDialog(includeHTML(here::here("html","welcome.html")), 
@@ -133,7 +150,7 @@ server <- function(input, output, session) {
     Kik$timelineStCtPlot(input1)
   })
   
-  output$tknRankMainTable <- renderTable({
+  output$tknRankMainTable <- DT::renderDataTable({
     input1 <- input$tknRankMain
     Kik$tknRankMain(input1)
   })
@@ -143,7 +160,7 @@ server <- function(input, output, session) {
     Kik$nmTknMainPlot(mainCat = myCat)
   })
   
-  output$fxTable <- renderTable({
+  output$fxTable <- DT::renderDataTable({
     myFx1 <- input$fx
     myFx2 <- input$fx2
     myCat <- input$fxCat 
