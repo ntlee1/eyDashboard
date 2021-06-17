@@ -23,7 +23,6 @@ ui <- fluidPage(
   tags$style(HTML(".btn {color: blue;
                   margin: 15px 0}")),
   
-  #Tables
   tags$style(HTML(".datatables > .dataTables_wrapper > .display > tbody > tr:nth-child(even) {background-color: #797878")),
   tags$style(HTML(".datatables > .dataTables_wrapper > .display > thead {background-color: #797878")),
   tags$style(HTML(".dataTables_filter {display: none}")),
@@ -32,11 +31,6 @@ ui <- fluidPage(
                   color: black; text-align: center}")),
   tags$style(HTML(".datatables > .dataTables_wrapper > .dataTables_info {color: white")),
   tags$style(HTML(".datatables > .dataTables_wrapper > .dataTables_paginate {background-color: white}")),
-  
- 
- 
-  
-  
   
   titlePanel(list(img(src = "eyLogo.png",
                       height = 135))),
@@ -56,7 +50,7 @@ ui <- fluidPage(
                                                      style = Shy$palWhite),
                                                  choices = Kik$timelineStCtInput$kikSize,
                                                  selected = "Small"),
-                                     plotOutput("myTimeline"),
+                                     plotly::plotlyOutput("myTimeline"),
                                      selectInput("mainCatPlot",
                                                  div("Select Main Category",
                                                      style = Shy$palWhite),
@@ -138,61 +132,43 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   #showModal(test)
-
-
+  
   output$myFundsRatio <- DT::renderDT(Kik$catRatioResults)
   
-  #Modals
   observeEvent(input$btnTimeline, {
     showModal(modalDialog(includeHTML(here::here("html","genSumNewCamp.html")), 
                           easyClose = TRUE))
   })
-  
   observeEvent(input$btnFunRat, {
     showModal(modalDialog(includeHTML(here::here("html","genSumFunRat.html")), 
                           easyClose = TRUE))
   })
-  
   observeEvent(input$btnPartialFun, {
     showModal(modalDialog(includeHTML(here::here("html","genSumPartialFun.html")), 
                           easyClose = TRUE))
   })
-  
   observeEvent(input$btnWCloud, {
     showModal(modalDialog(includeHTML(here::here("html","nmWCloud.html")), 
                           easyClose = TRUE))
   }) 
-  
   observeEvent(input$btnFxRank, {
     showModal(modalDialog(includeHTML(here::here("html","nmFxRank.html")), 
                           easyClose = TRUE))
   }) 
   
   
-  
-  
-  
-  
-  
-  
-  output$myTimeline <- renderPlot({
+  output$myTimeline <- plotly::renderPlotly({
     input1 <- input$timelineIn
     Kik$timelineStCtPlot(input1)
   })
-  
   output$tknRankMainTable <- DT::renderDataTable({
     input1 <- input$tknRankMain
     Kik$tknRankMain(input1)
   })
-  
   output$nmTknMainPlotOut <-renderPlot({
     myCat <- input$tknRankMain
     Kik$nmTknMainPlot(mainCat = myCat)
   })
-  
-  
-  
-  
   output$fxTable <- DT::renderDataTable({
     myFx1 <- input$fx
     myFx2 <- input$fx2
@@ -200,20 +176,15 @@ server <- function(input, output, session) {
     myTable <- Kik$tknFxRank(mainCat = myCat, baseCurr = myFx1, curr2 = myFx2)
     
   })
-  
-
   output$partialFundPlot <- renderPlot({
     inputPlot <- input$partialPlot
     Kik$partialFailPlot(inputPlot)
     
   })
-  
- 
   output$introVid <- renderUI({
     tags$iframe(src = "https://www.youtube.com/embed/hfPnq3i4Udw",
                 width = 600, height = 400)
   })
-  
   output$campaignCountCat <- renderPlot({
     myCat <- input$mainCatPlot
     mySize <- input$mainCatPlotSz

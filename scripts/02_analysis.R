@@ -712,6 +712,7 @@ Kik$timelineStCtPlot <- function(kikSize) {
       labs(title = "All Kickstarter Campaigns Launched by Year") +
       Kik$ggAutoTheme +
       Shy$plotColsEy
+    myPlot <- plotly::ggplotly(myPlot)
     
     return(myPlot)
   } else {
@@ -737,6 +738,7 @@ Kik$timelineStCtPlot <- function(kikSize) {
       labs(title = paste(mySize, "Kickstarter Campaigns Launched by Year")) +
       theme(plot.subtitle = element_text(size = 20, hjust = 0.5,
                                          margin = margin(b = 15)))
+    myPlot <- plotly::ggplotly(myPlot)
     
     return(myPlot)
   }
