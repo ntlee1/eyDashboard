@@ -527,53 +527,117 @@ Kik$tknRankMainFx <- function(mainCat, currency) {
   
 }
 
+
+
+
 #Compare relative positions of top 100 ranked words by currency
 Kik$tknFxRank <- function(mainCat, baseCurr, curr2) {
-  
-  myBaseCurr <- Kik$tknRankMainFx(mainCat, baseCurr)[1:100,1] %>%
-    cbind(., 1:100)
-  myCurr2 <- Kik$tknRankMainFx(mainCat, curr2)[1:100,1] %>%
-    cbind(., 1:100)
-  
-  #Words found only in base currency
-  onlyBase <- setdiff(myBaseCurr, myCurr2)
-  #Words found only in currency 2
-  onlyCurr2 <- setdiff(myCurr2, myBaseCurr)
-  
-  
-  #Base currency word rank positions
-  rankBase <- dplyr::filter(myBaseCurr, word %in% myCurr2$word)
-  #Currency 2 word rank positions positions
-  rankCurr2 <- dplyr::filter(myCurr2, word %in% myBaseCurr$word)
-  rankCurr2
-  
-  #Compare word ranks against base currency.
-  #These are words found in both currencies
-  #Take note of big differences in rank
-  #They explain cultural differences
-  compRank <- cbind(baseCurr = arrange(rankBase, word),
-                    curr2 = arrange(rankCurr2, word))
-  compRank$curr2Pos <- compRank[,2] - compRank[,4]
-  compRank <- compRank[, -c(3,4)]
-  compRank <- arrange(compRank, compRank[,2])
-  
-  #Add back in gbp words not found in usd
-  #Assign words not found in usd a position of NA
-  outMerge <- dplyr::filter(myBaseCurr, !(word %in% myCurr2[,1]))
-  outMerge$curr2Pos <- paste("Not in", curr2)
-  colnames(outMerge)[1:3] <- c("baseCurr.word", "baseCurr.1:100", "curr2Pos")
-  
-  outFinal <- rbind(compRank, outMerge)
-  #Final output. Ranked gbp words compared to usd rank.
-  outFinal <- arrange(outFinal, outFinal[,2])
-  colnames(outFinal) <- c(paste(baseCurr),
-                          paste(baseCurr, "Word Rank"),
-                          paste(curr2, "Relative Rank"))
-  outFinal <- DT::datatable(outFinal, 
-                caption = paste0("Table 1: ",baseCurr,"/",curr2, " Relative Word Rank Positions"))
-  
-  return(outFinal)
+  if(identical(baseCurr, curr2)){
+    failIdCurr <- data.frame(`Base Currency` = "",
+                             `Relative Currency` = "",
+                             `Relative Rank` = "")
+    failIdCurrDt <- DT::datatable(failIdCurr,
+                                  caption = "Please Choose Two Different Currencies")
+    
+    return(failIdCurrDt)
+  } else {
+    
+    myBaseCurr <- Kik$tknRankMainFx(mainCat, baseCurr)[1:100,1] %>%
+      na.omit(myBaseCurr)
+    
+    myCurr2 <- Kik$tknRankMainFx(mainCat, curr2)[1:100,1] %>%
+      na.omit(myCurr2)
+    
+    minWordList <- min(length(myBaseCurr$word), length(myCurr2$word))
+    
+    myBaseCurr <- myBaseCurr[1:minWordList,] %>%
+      cbind(1:minWordList)
+    colnames(myBaseCurr)[2] <- "Rank"
+    myCurr2 <- myCurr2[1:minWordList,] %>%
+      cbind(1:minWordList)
+    colnames(myCurr2)[2] <- "Rank"
+    
+    
+    #Words found only in base currency
+    onlyBase <- setdiff(myBaseCurr, myCurr2)
+    #Words found only in currency 2
+    onlyCurr2 <- setdiff(myCurr2, myBaseCurr)
+    
+    
+    #Base currency word rank positions
+    rankBase <- dplyr::filter(myBaseCurr, word %in% myCurr2$word)
+    #Currency 2 word rank positions positions
+    rankCurr2 <- dplyr::filter(myCurr2, word %in% myBaseCurr$word)
+    
+    
+    #Compare word ranks against base currency.
+    #These are words found in both currencies
+    #Take note of big differences in rank
+    #They explain cultural differences
+    compRank <- cbind(baseCurr = arrange(rankBase, word),
+                      curr2 = arrange(rankCurr2, word))
+    compRank$curr2Pos <- compRank[,2] - compRank[,4]
+    compRank <- compRank[, -c(3,4)]
+    compRank <- arrange(compRank, compRank[,2])
+    
+    #Add back in gbp words not found in usd
+    #Assign words not found in usd a position of NA
+    outMerge <- dplyr::filter(myBaseCurr, !(word %in% myCurr2[,1]))
+    
+    outMerge$curr2Pos <- paste("Not in", curr2)
+    colnames(outMerge)[1:3] <- c("baseCurr.word", "baseCurr.Rank", "curr2Pos")
+    
+    outFinal <- rbind(compRank, outMerge)
+    #Final output. Ranked gbp words compared to usd rank.
+    outFinal <- arrange(outFinal, outFinal[,2])
+    colnames(outFinal) <- c(paste(baseCurr),
+                            paste(baseCurr, "Absolute Word Rank"),
+                            paste(curr2, "Relative Rank"))
+    
+    outFinalDt <- DT::datatable(outFinal, 
+                                caption = paste0("Table 1: ",
+                                                 baseCurr,
+                                                 "/", 
+                                                 curr2,
+                                                 " Words in Common Rank Comparison",
+                                                 " For Category",
+                                                 " ",
+                                                 mainCat))
+    
+    if(identical(outFinal[,3],(rep(paste("Not in", curr2),
+                                   times = length(outFinal[,3]))))) {
+      outFinal <- outFinal[1,]
+      outFinal[1,] <- "No Words in Common"
+      outFinalDt <- DT::datatable(outFinal, 
+                                  caption = paste0("Table 1: ",
+                                                   baseCurr,
+                                                   "/",
+                                                   curr2,
+                                                   " Words in Common Rank Comparison",
+                                                   " For Category",
+                                                   " ",
+                                                   mainCat, " (Max 100)"))
+      
+      return(outFinalDt)
+    } else {
+      notInFilter <- dplyr::filter(outFinal,
+                                   !outFinal[3] == paste("Not in", curr2))
+      notInFilterOut <- DT::datatable(notInFilter,
+                                      caption = paste0("Table 1: ",
+                                                       baseCurr,
+                                                       "/",
+                                                       curr2,
+                                                       " Words in Common Rank Comparison",
+                                                       " For Category",
+                                                       " ",
+                                                       mainCat, " (Max 100)"))
+      return(notInFilterOut)
+    }
+  }
 }
+
+
+
 
 #Alphabetical inputs for shiny
 Kik$tknFxRankInput <- data.frame(currency = unique(Kik$kiksrt$currency))
@@ -611,11 +675,8 @@ Kik$catRatioResults <- pmap(Kik$mainCatRatioInput, Kik$mainCatRatio) %>%
 colnames(Kik$catRatioResults) <- c("Main Category", "Excess Funds Raised Multiple")
 
 Kik$catRatioResults <- arrange(Kik$catRatioResults, desc(`Excess Funds Raised Multiple`)) %>% 
-  DT::datatable(., options = list(
-  lengthMenu = FALSE),
-  caption = "Table 1: This Table Compares Aggregated Excess Funds Raised for All Projects in Each Category.",
-  class = "cell-border stripe"
-  )
+  DT::datatable(.,
+  caption = "Table 1: This Table Compares Aggregated Excess Funds Raised for All Projects in Each Category.")
 
 
 
