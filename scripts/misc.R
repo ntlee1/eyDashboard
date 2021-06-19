@@ -384,6 +384,49 @@ Kik$NmTknMainPlot("Food")
 
 
 
+kikSize <- "All Projects"
+myHeight <- 
+myWidth <- 100
+
+
+Kik$timelineStCt <- dplyr::filter(Kik$timeline, state == c("successful", "failed")) %>%
+  dplyr::group_by(state, launchYear) %>%
+  summarise(n())
+
+
+
+
+myPlot <-  Kik$timelineStCt %>%
+  ggplot2::ggplot(., aes(x = launchYear, y = `n()`, fill = state)) +
+  geom_col(position = "dodge", color = "#222A35") +
+  Kik$ggAutoTheme +
+  Shy$plotColsEy +
+  scale_fill_manual(values = c(failed = "red", successful = "green"),
+                    labels = c("Failed", "Successful"),
+                    name = "State") +
+  xlab("Year") +
+  ylab(stringr::str_wrap("Number of Kickstarter Campaigns", width = 25)) +
+  labs(title = stringr::str_wrap("All Kickstarter Campaigns Launched by Year",
+                                 width = 60)) +
+  theme(plot.margin = unit(c(2,2,2,2), "cm"),
+        axis.text.x = element_text(size = 4)) 
+
+##################
+
+
+myPlot <-  Kik$timelineStCt %>%
+  ggplot2::ggplot(., aes(x = launchYear, y = `n()`, fill = state)) +
+  geom_col(position = "dodge", color = "#222A35") +
+  theme(axis.text.x = element_text(size = ))
+
+myPlot
+
+
+myPlot$labels$x
+
+ggplot_build(myPlot)
+
+Kik$ggAutoTheme 
 
 
 
@@ -391,23 +434,14 @@ Kik$NmTknMainPlot("Food")
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  <h3 style = "text-align: center;">This Dashboard Delivers Actionable Insights Including:</h3>
+  <ul>
+  <li>Compare and contrast popular trends between foreign currencies</li>
+  <li>Find out which subcategories are the most popular</li>
+  <li>See how close failed projects come to reaching their goal</li>
+  <li>and more!</li>
+  </ul>
+  <hr />
 
 
 

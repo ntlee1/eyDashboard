@@ -21,6 +21,10 @@ Kik$colFct <- c("category",
 Kik$kiksrt[, Kik$colFct] <- lapply(Kik$kiksrt[, Kik$colFct],
                                    as.factor)
 
+#Common ggplot specifications to save time
+#Must always place these specifications immediately after the geom
+#That way I can partially overwrite them with another call to theme if needed
+
 #Shiny UI Plot Modifications 
 #Weird white line shows up on bottom of plot. 
 #Plot border specified as background color
@@ -32,16 +36,17 @@ Shy$plotColsEy <- list(theme(plot.background = element_rect(fill = Shy$palBkGrou
                              axis.text = element_text(color = "white"),
                              legend.text = element_text(color = "white")))
 
-#Standard ggplot theme
+#ggplot mods I use often
 Kik$ggAutoTheme <- list(theme(plot.title = element_text(hjust = 0.5,
-                                                        size = 28,
+                                                        size = 24,
                                                         margin = margin(t = 16,
                                                                         b = 16)),
                               axis.title.y = element_text(margin = margin(r = 16,
                                                                           l = 16)),
                               axis.title.x = element_text(margin = margin(t = 16,
                                                                           b = 16)),
-                              text = element_text(size = 24)))
+                              text = element_text(size = 20),
+                              axis.text.x = element_text(angle = 90)))
 
 
 #Cleanse and Check Each Column for Errors --------------------------------------
@@ -199,22 +204,22 @@ Kik$kiksrt <- dplyr::select(Kik$kiksrt, -c(`usd pledged`))
 #Create 4 categories of campaign size ------------------------------------------
 #Based on quantiles of usd_goal_real, state = success
 #Quantiles ($) = 1300, 3840, 10000
-#Project Sizes: Small, Mid, Large, Premium
+#Project Sizes: Small, Med, Large, Premium
 dplyr::filter(Kik$kiksrt, state == "successful")["usd_goal_real"] %>%
   summary
 
 Kik$kiksrt$size <- "empty"
 Kik$kiksrt[Kik$kiksrt$usd_goal_real < 1300, "size"] <- "Small"
 Kik$kiksrt[1300 <= Kik$kiksrt$usd_goal_real &
-             Kik$kiksrt$usd_goal_real < 3838, "size"] <- "Mid"
+             Kik$kiksrt$usd_goal_real < 3838, "size"] <- "Med"
 Kik$kiksrt[3838 <= Kik$kiksrt$usd_goal_real &
              Kik$kiksrt$usd_goal_real < 10000, "size"] <- "Large"
 Kik$kiksrt[10000 <= Kik$kiksrt$usd_goal_real, "size"] <- "Prem"
 dplyr::filter(Kik$kiksrt, size == "empty")
 Kik$kiksrt$size <- factor(Kik$kiksrt$size,
-                          levels = c("Small", "Mid", "Large", "Prem"))
+                          levels = c("Small", "Med", "Large", "Prem"))
 Kik$sizeExplain <- data.frame(comment = c("Small projects goal range is $0-1299",
-                                          "Mid projects goal range is $1300-3839",
+                                          "Med projects goal range is $1300-3839",
                                           "Large projects goal range is $3840-9999",
                                           "Prem projects goal range is $10000+"))
 Kik$sizeExplain$size <- levels(Kik$kiksrt$size)
@@ -249,7 +254,7 @@ Kik$brkoutSm <- dplyr::filter(Kik$brkout, size == "Small")
 Kik$brkoutSm <- dplyr::filter(Kik$brkoutSm,
                               excess_ratio <= stats::median(Kik$brkoutSm$excess_ratio,))
 
-Kik$brkoutMd <- dplyr::filter(Kik$brkout, size == "Mid")
+Kik$brkoutMd <- dplyr::filter(Kik$brkout, size == "Med")
 Kik$brkoutMd <- dplyr::filter(Kik$brkoutMd,
                               excess_ratio <= stats::median(Kik$brkoutMd$excess_ratio))
 
@@ -307,7 +312,7 @@ Kik$charPlot <-
             aes(x = charCt, colour = size),
             stat = "bin", size = 1) +
   geom_line(data = dplyr::filter(Kik$charKik$kiksrt,
-                                 size == "Mid", state == "successful"),
+                                 size == "Med", state == "successful"),
             aes(x = charCt, colour = size),
             stat = "bin", size = 1) +
   geom_line(data = dplyr::filter(Kik$charKik$kiksrt, 
@@ -318,12 +323,12 @@ Kik$charPlot <-
                                  size == "Prem", state == "successful"),
             aes(x = charCt, colour = size),
             stat = "bin", size = 1) +
+  Shy$plotColsEy +
   xlab("Campaign Name Length (characters)") +
   ylab("Number of Projects") +
   labs(title = "Name Length of Successful Campaigns") +
   Kik$ggAutoTheme +
   theme(plot.title = element_text(hjust = 0.5)) +
-  Shy$plotColsEy +
   scale_colour_discrete(name = "Campaign Size")
 
 #TOPIC: WORD ANALYSIS ----------------------------------------------------------
@@ -703,15 +708,16 @@ Kik$timelineStCtPlot <- function(kikSize) {
     
     myPlot <-  Kik$timelineStCt %>%
       ggplot2::ggplot(., aes(x = launchYear, y = `n()`, fill = state)) +
-      geom_col(position = "dodge", color = "#222A35") +
+      geom_col(position = "stack") +
+      Shy$plotColsEy +
       scale_fill_manual(values = c(failed = "red", successful = "green"),
                         labels = c("Failed", "Successful"),
                         name = "State") +
       xlab("Year") +
-      ylab("Number of Kickstarter Campaigns") +
-      labs(title = "All Kickstarter Campaigns Launched by Year") +
+      ylab("Number of Campaigns") +
+      labs(title = "All Campaigns Launched by Year") +
       Kik$ggAutoTheme +
-      Shy$plotColsEy
+      coord_flip() 
     myPlot <- plotly::ggplotly(myPlot)
     
     return(myPlot)
@@ -727,25 +733,23 @@ Kik$timelineStCtPlot <- function(kikSize) {
     
     myPlot <- Kik$timelineStCt %>%
       ggplot2::ggplot(., aes(x = launchYear, y = `n()`, fill = state)) +
-      geom_col(position = "dodge", color = "#222A35") +
+      geom_col(position = "stack") +
       Kik$ggAutoTheme +
       Shy$plotColsEy +
       scale_fill_manual(values = c(failed = "red", successful = "green"),
                         labels = c("Failed", "Successful"),
-                        name = "Campaign State") +
+                        name = "State") +
       xlab("Year") +
-      ylab("Number of Kickstarter Campaigns") +
-      labs(title = paste(mySize, "Kickstarter Campaigns Launched by Year")) +
+      ylab("Number of Campaigns") +
+      labs(title = paste(mySize, "Campaigns Launched by Year")) +
       theme(plot.subtitle = element_text(size = 20, hjust = 0.5,
-                                         margin = margin(b = 15)))
+                                         margin = margin(b = 15))) +
+      coord_flip()
     myPlot <- plotly::ggplotly(myPlot)
     
     return(myPlot)
   }
 }
-
-
-
 
 #Breakdown of Number of Projects per Category ----------------------------------
 Kik$catSmry <- Kik$kiksrtSuccFail
@@ -766,20 +770,16 @@ Kik$mainCatPlot <- function(mainCategory, kikSize) {
       geom_col(position = "stack") +
       scale_fill_manual(values = c(successful = "green", failed = "red"),
                         labels = c("Failed", "Successful"),
-                        name = "Campaign State") +
-      coord_flip() +
+                        name = "State") +
       Kik$ggAutoTheme +
       Shy$plotColsEy +
-      theme(axis.text.x = element_text(angle = 90,
-                                       vjust = 0.2),
-            plot.title = element_text(hjust = 0.5),
-            plot.margin = margin(r = 29)) +
-      
+      coord_flip() +
+      Kik$ggAutoTheme +
       xlab(paste(myMainCategory, "Subcategory")) +
       ylab("Count") +
       labs(title = paste("Number of Campaigns in", myMainCategory,
                          "Subcategories 2009-2018"))
-    
+    mySubcatPlot <- plotly::ggplotly(mySubcatPlot)
     return(mySubcatPlot)
   } else {
     myMainCategory <- mainCategory
@@ -797,20 +797,15 @@ Kik$mainCatPlot <- function(mainCategory, kikSize) {
       geom_col(position = "stack") +
       scale_fill_manual(values = c(successful = "green", failed = "red"),
                         labels = c("Failed", "Successful"),
-                        name = "Campaign State") +
-      coord_flip() +
-      Kik$ggAutoTheme +
+                        name = "State") +
       Shy$plotColsEy +
-      theme(axis.text.x = element_text(angle = 90,
-                                       vjust = 0.2),
-            plot.title = element_text(hjust = 0.5),
-            plot.margin = margin(r = 29)) +
-      
+      Kik$ggAutoTheme +
+      coord_flip() +
       xlab(paste(myMainCategory, "Subcategory")) +
       ylab("Count") +
       labs(title = paste("Number of", mySize, "Campaigns Launched in", myMainCategory,
                          "Subcategories 2009-2018"))
-    
+    mySubcatPlot <- plotly::ggplotly(mySubcatPlot)
     return(mySubcatPlot)
   }
 }
@@ -866,18 +861,18 @@ dplyr::count(Kik$kikPartialFailSmallZero)
 mean(Kik$kikPartialFailSmall$partialFail)
 stats::median(Kik$kikPartialFailSmall$partialFail)
 
-#Mid
-Kik$kikPartialFailMid <- dplyr::filter(Kik$kikPartialFail, size == "Mid",
+#Med
+Kik$kikPartialFailMed <- dplyr::filter(Kik$kikPartialFail, size == "Med",
                                        !partialFail == 0)
-Kik$kikPartialFailMidZero <- dplyr::filter(Kik$kikPartialFail, size == "Mid", 
+Kik$kikPartialFailMedZero <- dplyr::filter(Kik$kikPartialFail, size == "Med", 
                                            partialFail == 0)
-#~28k Mid projects raised some money. ~7.3k Mid projects raised no money
-dplyr::count(Kik$kikPartialFailMid)
-dplyr::count(Kik$kikPartialFailMidZero)
-#Mid failed projects only raise (Average ~13%, Median ~6.2%) of 
+#~28k Med projects raised some money. ~7.3k Med projects raised no money
+dplyr::count(Kik$kikPartialFailMed)
+dplyr::count(Kik$kikPartialFailMedZero)
+#Med failed projects only raise (Average ~13%, Median ~6.2%) of 
 #their required capital
-mean(Kik$kikPartialFailMid$partialFail)
-stats::median(Kik$kikPartialFailMid$partialFail)
+mean(Kik$kikPartialFailMed$partialFail)
+stats::median(Kik$kikPartialFailMed$partialFail)
 
 #Large
 Kik$kikPartialFailLarge <- dplyr::filter(Kik$kikPartialFail, size == "Large",
@@ -915,7 +910,8 @@ Kik$partialFailPlot <- function(size) {
   colnames(myCut) <- c("Breaks", "Count")
   
   myPlot <- ggplot2::ggplot(myCut, aes(x = Breaks, y = Count, fill = Breaks)) +
-    geom_histogram(stat = "identity", fill = "#FFE700", color = "#222A35") +
+    geom_histogram(stat = "identity", fill = "#FFE700") +
+    Shy$plotColsEy +
     theme(axis.text.x = element_text(angle = 90,
                                      size = 16),
           axis.text.y = element_text(size = 16),
@@ -924,15 +920,15 @@ Kik$partialFailPlot <- function(size) {
           legend.position = "none",
           axis.title.x = element_text(size = 24),
           axis.title.y = element_text(size = 24)) +
-    Shy$plotColsEy +
     xlab("Percent Bins (%)") +
     ylab("Number of Kickstarter Campaigns") +
     labs(title = paste("Percent of Goal Reached:", "Failed", mySize, "Campaigns")) +
-    coord_flip() 
+    coord_flip()
+  myPlot <- plotly::ggplotly(myPlot)
   return(myPlot)
 }
 
-Kik$partialFailPlotInputs <- data.frame(size = c("Small", "Mid", "Large", "Prem"))
+Kik$partialFailPlotInputs <- data.frame(size = c("Small", "Med", "Large", "Prem"))
 #purrr::pmap(Kik$partialFailPlotInputs, Kik$partialFailPlot)
 
 

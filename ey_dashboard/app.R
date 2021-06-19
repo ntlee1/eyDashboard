@@ -11,7 +11,7 @@ Shy$palWhite <- "color: white"
 
 ui <- fluidPage(
   #modalDialog(includeHTML(here::here("html","welcome.html")),
-  #           easyClose = TRUE),
+            # easyClose = TRUE),
   
   shinyWidgets::setBackgroundColor("#1C2134"),
   tags$style(HTML(" *{border-style: none !important}")),
@@ -31,14 +31,18 @@ ui <- fluidPage(
                   color: black; text-align: center}")),
   tags$style(HTML(".datatables > .dataTables_wrapper > .dataTables_info {color: white")),
   tags$style(HTML(".datatables > .dataTables_wrapper > .dataTables_paginate {background-color: white}")),
+  tags$style(HTML("#myTimeline {width: 80vw !important}")),
+  tags$style(HTML("#campaignCountCat {width: 80vw !important}")),
+  tags$style(HTML("#partialFundPlot {width: 80vw !important}")),
+
   
   titlePanel(list(img(src = "eyLogo.png",
                       height = 135))),
   
   sidebarLayout(
     navlistPanel("KICKSTARTER PREDICTOR", widths = c(2,8),
-                 tabPanel("Walkthrough",
-                          htmlOutput("introVid")),
+#                 tabPanel("Walkthrough",
+ #                         htmlOutput("introVid")),
                  tabPanel("General Summary",
                           tabsetPanel(
                             tabPanel(div("New Campaign Timeline",
@@ -50,7 +54,8 @@ ui <- fluidPage(
                                                      style = Shy$palWhite),
                                                  choices = Kik$timelineStCtInput$kikSize,
                                                  selected = "Small"),
-                                     plotly::plotlyOutput("myTimeline"),
+                                     plotly::plotlyOutput("myTimeline",
+                                                          width = "100%"),
                                      selectInput("mainCatPlot",
                                                  div("Select Main Category",
                                                      style = Shy$palWhite),
@@ -61,7 +66,7 @@ ui <- fluidPage(
                                                      style = Shy$palWhite),
                                                  choices = Kik$mainCatPlotInputSz$kikSize,
                                                  selected = "Small"),
-                                     plotOutput("campaignCountCat")),
+                                     plotly::plotlyOutput("campaignCountCat")),
                             tabPanel(div("Funds Ratio",
                                          style = Shy$palEyYellow),
                                      (actionButton("btnFunRat", label = "Click for Info",
@@ -75,11 +80,11 @@ ui <- fluidPage(
                                                  div("Select Size",
                                                      style = Shy$palWhite),
                                                  choices = c("Small",
-                                                             "Mid",
+                                                             "Med",
                                                              "Large",
                                                              "Prem"),
                                                  selected = "Small"),
-                                     plotOutput("partialFundPlot"))
+                                     plotly::plotlyOutput("partialFundPlot"))
                           )
                  ),
                  tabPanel("Campaign Name Analysis",
@@ -161,11 +166,16 @@ server <- function(input, output, session) {
     input1 <- input$timelineIn
     Kik$timelineStCtPlot(input1)
   })
+  output$campaignCountCat <- plotly::renderPlotly({
+    myCat <- input$mainCatPlot
+    mySize <- input$mainCatPlotSz
+    Kik$mainCatPlot(mainCategory = myCat, kikSize = mySize)
+  })
   output$tknRankMainTable <- DT::renderDataTable({
     input1 <- input$tknRankMain
     Kik$tknRankMain(input1)
   })
-  output$nmTknMainPlotOut <-renderPlot({
+  output$nmTknMainPlotOut <- renderPlot({
     myCat <- input$tknRankMain
     Kik$nmTknMainPlot(mainCat = myCat)
   })
@@ -176,7 +186,7 @@ server <- function(input, output, session) {
     myTable <- Kik$tknFxRank(mainCat = myCat, baseCurr = myFx1, curr2 = myFx2)
     
   })
-  output$partialFundPlot <- renderPlot({
+  output$partialFundPlot <- plotly::renderPlotly({
     inputPlot <- input$partialPlot
     Kik$partialFailPlot(inputPlot)
     
@@ -185,11 +195,7 @@ server <- function(input, output, session) {
     tags$iframe(src = "https://www.youtube.com/embed/hfPnq3i4Udw",
                 width = 600, height = 400)
   })
-  output$campaignCountCat <- renderPlot({
-    myCat <- input$mainCatPlot
-    mySize <- input$mainCatPlotSz
-    Kik$mainCatPlot(mainCategory = myCat, kikSize = mySize)
-  })
+
 }
 
 shinyApp(ui, server)

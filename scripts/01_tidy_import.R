@@ -23,34 +23,6 @@ Init$pkgReq <- c("tidyverse",
                  "stats",
                  "wordcloud",
                  "rlang",
-                 "DT")
+                 "DT",
+                 "ggrepel")
 lapply(Init$pkgReq, require, character.only = TRUE)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
