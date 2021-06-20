@@ -1,10 +1,6 @@
 #Environments start with uppercase
 #For kikstarter data
 Kik <- new.env()
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 #For Shiny 
 Shy <- new.env()
 #Shiny Palette
@@ -16,20 +12,6 @@ Kik$pathKikData <- here::here("data", "Kickstarter Data","ksprojects.csv")
 Kik$kiksrt <- readr::read_csv(Kik$pathKikData) %>%
   as_tibble
 
-<<<<<<< HEAD
-=======
-=======
-
-#TOPIC: WRANGLE ################################################################
-#Import Data -------------------------------------------------------------------
-Kik$kiksrt <- readr::read_csv(here::here("data", "Kickstarter Data",
-                                         "ksprojects.csv")) %>%
-  as_tibble
-
-colnames(Kik$kiksrt)
-lapply(Kik$kiksrt, class)
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 #Convert select cols to factor for easier manipulation
 Kik$colFct <- c("category",
                 "main_category",
@@ -39,14 +21,10 @@ Kik$colFct <- c("category",
 Kik$kiksrt[, Kik$colFct] <- lapply(Kik$kiksrt[, Kik$colFct],
                                    as.factor)
 
-<<<<<<< HEAD
 #Common ggplot specifications to save time
 #Must always place these specifications immediately after the geom
 #That way I can partially overwrite them with another call to theme if needed
 
-=======
-<<<<<<< HEAD
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 #Shiny UI Plot Modifications 
 #Weird white line shows up on bottom of plot. 
 #Plot border specified as background color
@@ -74,28 +52,13 @@ Kik$ggAutoTheme <- list(theme(plot.title = element_text(hjust = 0.5,
 #Cleanse and Check Each Column for Errors --------------------------------------
 #NAs ---------------------------------------------------------------------------
 #Fix NAs in cols: name, usd_pledged
-<<<<<<< HEAD
-=======
-=======
-#Cleanse and Check Each Column for Errors --------------------------------------
-#NAs ---------------------------------------------------------------------------
-#name, usd_pledged have NAs.
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 purrr::map(Kik$kiksrt, ~sum(is.na(.)))
 
 #Find row position of NAs 
 Kik$naVal <- 1:ncol(Kik$kiksrt)
 Kik$naOut <- vector("list", length(Kik$naVal))
 Kik$naCols <- vector("list", length(Kik$naVal))
-<<<<<<< HEAD
 
-=======
-<<<<<<< HEAD
-
-=======
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 for (i in seq_along(Kik$naVal)) {
   Kik$naOut[[i]] <- which(is.na(Kik$kiksrt[,i]))
   Kik$naCols[[i]] <-  print(colnames(Kik$kiksrt[,i]))
@@ -104,10 +67,6 @@ names(Kik$naOut) <- Kik$naCols
 Kik$naOut
 
 #4 projects have no name. Assign "NONAME"
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 Kik$kiksrt[Kik$naOut$name,]$name <- "NONAME"
 
 #7400+ Projects have no value for usd pledged. No action taken now until needed
@@ -118,35 +77,12 @@ Kik$plgNa <- Kik$naOut$`usd pledged`
 #When state == undefined, I noticed usd pledged is NA in every observation. 
 #It appears the API relies on state being defined to give usd pledged a value. 
 #We can still infer campaign success by usd_pledged_real >= usd_goal_real.
-<<<<<<< HEAD
-=======
-=======
-#view(Kik$kiksrt[Kik$naOut$name,])
-Kik$kiksrt[Kik$naOut$name,]$name <- "NONAME"
-#7400+ Projects have no value for usd pledged. No action taken now until needed
-#view(Kik$kiksrt[Kik$naOut$`usd pledged`,])
-Kik$plgNa <- Kik$naOut$`usd pledged`
-
-#Fix misclassified state values ------------------------------------------------
-#When state == undefined, I noticed usd pledged is NA in every observation 
-#It appears the API relies on state being defined to give usd pledged a value 
-#We can still infer campaign success by usd_pledged_real >= usd_goal_real
-unique(Kik$kiksrt$state)
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 Kik$stUnd <- (filter(Kik$kiksrt, state == "undefined"))
 sum(is.na(Kik$stUnd$`usd pledged`)) == nrow(Kik$stUnd)
 Kik$stUndSucc <- (filter(Kik$kiksrt, state == "undefined" &
                            usd_pledged_real >= usd_goal_real))
 Kik$stUndSucc$state <- "successful"
-<<<<<<< HEAD
 
-=======
-<<<<<<< HEAD
-
-=======
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 Kik$stUndFail <- (filter(Kik$kiksrt, state == "undefined" &
                            usd_pledged_real <= usd_goal_real))
 Kik$stUndFail$state <- "failed"
@@ -155,27 +91,12 @@ Kik$kiksrt <- filter(Kik$kiksrt, !state == "undefined") %>%
 
 #Eliminate projects with funds raised but number of backers is missing ---------
 #Can't infer conclusions if there are funds raised but by an unknown number 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 #of backers.
 #Only ~3000 cases, trivial amount that wont impact overall analysis
 #Don't know why API did not include backers in these cases
 Kik$noBkr <- dplyr::filter(Kik$kiksrt, backers == 0 &
                              0 < usd_pledged_real)
 Kik$kiksrt <- dplyr::filter(Kik$kiksrt, !(ID %in% Kik$noBkr$ID))
-<<<<<<< HEAD
-=======
-=======
-#of backers. Only ~3000 cases, trivial amount of cases that wont impact overall 
-#analysis
-#Don't know why API did not include backers in these cases
-Kik$noBkrNum <- dplyr::filter(Kik$kiksrt, backers == 0 &
-                                0 < usd_pledged_real)
-Kik$kiksrt <- dplyr::filter(Kik$kiksrt, !(ID %in% Kik$noBkrNum$ID))
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 
 #Check for duplicate rows. 0 found --------------------------------------------
 length(Kik$kiksrt$ID) == length(unique(Kik$kiksrt$ID))
@@ -190,24 +111,10 @@ unique(Kik$kiksrt$main_category)
 unique(Kik$kiksrt$currency)
 
 #Fix incorrect deadline dates --------------------------------------------------
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 #~7 launch dates are misformatted as 1970-01-01.
 #This is not a valid. Kickstarter was founded in 2009.
 #It appears the API defaulted to the POSIX start date for an unknown reason.
 #For practical purposes I have set the launch date 1 month before deadline.
-<<<<<<< HEAD
-=======
-=======
-#~7 launch dates are misformatted as 1970-01-01
-#This is not a valid. Kickstarter was founded in 2009
-#It appears the web scraping API defaulted to the POSIX start date for an
-#unknown reason
-#For practical purposes I have set the launch date 1 month before deadline
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 
 #Remove timestamp from launched for easy manipulation
 Kik$kiksrt$launched <- as.Date(Kik$kiksrt$launched, format = "%Y-%m-%d")
@@ -218,10 +125,6 @@ Kik$mod1970$launched <- Kik$mod1970$deadline %m-% months(1)
 Kik$kiksrt[Kik$kiksrt$launched == "1970-01-01",
            "launched"] <- Kik$mod1970$launched
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 #Kickstarter DOES NOT provide accurate foreign conversion. Fixer.io does. ------
 #Reasoning:
 #Logically, if you examine projects in base currency USD,
@@ -232,33 +135,10 @@ Kik$kiksrt[Kik$kiksrt$launched == "1970-01-01",
 #Lets examine USD projects to determine which cols provide correct fx conversion
 #Kickstarter = `usd pledged`
 #Fixer io = `usd_pledged_real`
-<<<<<<< HEAD
-=======
-=======
-#Kickstarter DOES NOT provide accurate usd pledged data. Fixer.io does. -------- 
-#Reasoning:
-#I suspect data scraping errors in fx conversion columns usd_pledged
-#and usd_pledged_real
-#Logically, if a project is in base currency USD,
-#columns "pledged", "usd_pledged", and "usd_pledged_real" should be equivalent.
-#They all measure the same metric, total USD dollars pledged
-#This is not always the case. There are major discrepancies. 
-#For simplicity, lets analyze USD projects as the FX conversion is 1:1
-#TODO MAYBE check NAs for other currencies and import external data for use
-
-#Pledge Accuracy: Kickstarter vs Fixer.io
-#Filter all projects with base USD currency
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 #~293k USD Projects
 Kik$usd <- dplyr::filter(Kik$kiksrt, `currency` == "USD")
 Kik$usdNum <- nrow(Kik$usd)
 
-<<<<<<< HEAD
-#Kickstarter
-#Compare fx conversion accuracy as ratio against correct value in col `pledged`
-=======
-<<<<<<< HEAD
 #Kickstarter
 #Compare fx conversion accuracy as ratio against correct value in col `pledged`
 Kik$usdKik <- Kik$usd$pledged == Kik$usd$`usd pledged`
@@ -308,78 +188,12 @@ Kik$audOfxFixer <- Kik$aud$fixer_rate/Kik$aud$ofx_rate
 #Reasonable numbers. Low spread, low variance
 #NAs are removed but do not impact accuracy ratio. 
 #These are simply projects with zero money raised. Thus 0/0
-=======
-#Create accuracy ratio for usd_pledged. Compare against correct amount 
-#in pledged
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
-Kik$usdKik <- Kik$usd$pledged == Kik$usd$`usd pledged`
-#Filter out NAs for accurate ratio, ~500 NAs detected
-Kik$usdKikNa <- sum(is.na(Kik$usdKik))
-#Kickstarter provides the correct USD FX conversion 85% of the time for 
-#USD projects
-Kik$usdKikAcc <- (sum(Kik$usdKik, na.rm = TRUE)/(Kik$usdNum - Kik$usdKikNa)) %>%
-  round(., digits = 3)
-
-#Create fixer.io accuracy ratio for usd_pledged_real
-Kik$usdFixer <- Kik$usd$pledged == Kik$usd$usd_pledged_real
-#No NAs detected from fixer.io
-Kik$usdFixerNa <- sum(is.na(Kik$usdFixer))
-#Fixer.io provides the correct USD FX conversion 100% of the time for 
-#USD projects
-#Added benefit of zero NAs
-Kik$usdFixerAcc <- sum(Kik$usdFixer)/Kik$usdNum
-
-#Can we rely on Fixer.io to provide 100% accuracy for other denominations?
-#Validation Process: 
-#1. Import external USD FX conversion data for time period 
-#2. Convert pledged column manually and compare to fixer.io 
-#3. If relatively similar then fixer.io is assumed accurate 
-unique(Kik$kiksrt$currency)
-
-#Step1: 
-#Import FX data. https://www.ofx.com/en-us/forex-news/historical-exchange-rates/
-#Note that FX data will differ because exact time of day isn't taken 
-#into account
-#YMD 
-Ofx <- new.env()
-#Date range I need to import
-range(Kik$kiksrt$deadline)
-
-#Test fixer.io accuracy for USDAUD to verify accuracy with a non-USD denomination
-Ofx$ofxUsdAud <- readxl::read_xlsx(here::here("data", "ofx_fx_data",
-                                              "USDAUD_ofx.xlsx"))
-Kik$aud <- dplyr::filter(Kik$kiksrt, `currency` == "AUD")
-#Forex rates
-Kik$aud$fixer_rate <- Kik$aud$pledged/Kik$aud$usd_pledged_real
-Kik$aud$kik_rate <- Kik$aud$pledged/Kik$aud$`usd pledged`
-#~9400 AUD projects
-nrow(Kik$aud)
-Ofx$ofxUsdAud$Date <- as.Date(Ofx$ofxUsdAud$Date, format = "%Y-%m-%d")
-colnames(Ofx$ofxUsdAud) <- c("deadline", "ofx_rate")
-Kik$aud <- right_join(Kik$aud, Ofx$ofxUsdAud, by = "deadline")
-
-#Fixer.io forex conversion is highly accurate. 
-#Accuracy ranges from factor of 0.95 to 1.15, variance 0.00012
-#Reasonable numbers. Low spread, low variance
-<<<<<<< HEAD
-#NAs are removed but do not impact accuracy ratio. 
-#These are simply projects with zero money raised. Thus 0/0
-=======
-Kik$audOfxFixer <- Kik$aud$fixer_rate/Kik$aud$ofx_rate
-
-#1715 NAs detected. These are projects with zero money raised. Thus 0/0 forex
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 sum(is.na(Kik$aud$usd_pledged_real))
 Kik$audOfxFixer <- na.omit(Kik$audOfxFixer)
 range(Kik$audOfxFixer)
 var(Kik$audOfxFixer)
 
 #Kickstarter forex conversion is not accurate at all
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 #Accuracy spread multiplier is 0-1025. Very unreliable. 
 #Drop usd pledged for inaccuracy
 Kik$audOfxKik <- Kik$aud$kik_rate/Kik$aud$ofx_rate
@@ -390,24 +204,7 @@ Kik$kiksrt <- dplyr::select(Kik$kiksrt, -c(`usd pledged`))
 #Create 4 categories of campaign size ------------------------------------------
 #Based on quantiles of usd_goal_real, state = success
 #Quantiles ($) = 1300, 3840, 10000
-<<<<<<< HEAD
 #Project Sizes: Small, Med, Large, Premium
-=======
-=======
-#FX factor ranges from 0 to 1025 compared to ofx
-Kik$audOfxKik <- Kik$aud$kik_rate/Kik$aud$ofx_rate
-Kik$audOfxKik <- Kik$audOfxKik[is.finite(Kik$audOfxKik)]
-range(Kik$audOfxKik)
-
-#Drop usd pledged for inaccuracy
-Kik$kiksrt <- dplyr::select(Kik$kiksrt, -c(`usd pledged`))
-
-#Create 4 categories of project size using quantiles ---------------------------
-#of usd_goal_real, state = success
-#Quantiles = 1300, 3840, 10000
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
-#Project Sizes: Small, Mid, Large, Premium
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 dplyr::filter(Kik$kiksrt, state == "successful")["usd_goal_real"] %>%
   summary
 
@@ -419,10 +216,6 @@ Kik$kiksrt[3838 <= Kik$kiksrt$usd_goal_real &
              Kik$kiksrt$usd_goal_real < 10000, "size"] <- "Large"
 Kik$kiksrt[10000 <= Kik$kiksrt$usd_goal_real, "size"] <- "Prem"
 dplyr::filter(Kik$kiksrt, size == "empty")
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 Kik$kiksrt$size <- factor(Kik$kiksrt$size,
                           levels = c("Small", "Med", "Large", "Prem"))
 Kik$sizeExplain <- data.frame(comment = c("Small projects goal range is $0-1299",
@@ -446,49 +239,17 @@ Kik$kiksrt$projLen <- (Kik$kiksrt$deadline - Kik$kiksrt$launched) %>%
 #a realistic campaign. 
 
 #Filter for realistic campaigns
-<<<<<<< HEAD
-=======
-=======
-
-#Add Length of Campaign --------------------------------------------------------
-Kik$kiksrt$projLen <- (Kik$kiksrt$deadline - Kik$kiksrt$launched) %>%
-  as.numeric
-
-#Create optional filter: Filter out super successful kickstarter campaigns -----
-#Reason: Useful for modeling realistic fundraisers where pledge amount is 
-#similar, to goal amount
-#Analysis will say if I apply this breakout filter or not
-#Super successful = Breakout Success
-#Define breakout success as ratio of pledge dollars to goal amount and 
-#only campaigns below the median ratio for their size classification
-
-#Step 1: Find and filter out breakout success kickstarter campaigns 
-#Interested only in successful campaigns for success modeling
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 Kik$brkout <- Kik$kiksrt
 Kik$brkout <- dplyr::filter(Kik$brkout, state == "successful")
 #Example: excess_ratio of 1.4 means pledge funds matched 140% of the goal amount
 Kik$brkout$excess_ratio <- Kik$brkout$usd_pledged_real/Kik$brkout$usd_goal_real
 Kik$brkoutSummary <- summary(Kik$brkout$excess_ratio)
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 #Find median of `Kik$brkout$excess_ratio` for each project size classification
 #Motive: Larger projects will naturally have a smaller multiplier 
 #that signifies excessive pledge funds raised.
 #Its a lot harder to raise multiples of a goal amount of $1M compared to $1000 
 
-<<<<<<< HEAD
-=======
-=======
-#Step 2: Find median for each project size classification
-#Each size category will have different median ratio. Larger projects will
-#naturally have a smaller multiplier that signifies excessive pledge funds raised 
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 Kik$brkoutSm <- dplyr::filter(Kik$brkout, size == "Small")
 Kik$brkoutSm <- dplyr::filter(Kik$brkoutSm,
                               excess_ratio <= stats::median(Kik$brkoutSm$excess_ratio,))
@@ -505,33 +266,17 @@ Kik$brkoutPrem <- dplyr::filter(Kik$brkout, size == "Prem")
 Kik$brkoutPrem <- dplyr::filter(Kik$brkoutPrem,
                                 excess_ratio <= stats::median(Kik$brkoutPrem$excess_ratio))
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 Kik$brkout <- rbind(Kik$brkoutSm,
                     Kik$brkoutMd,
                     Kik$brkoutLg,
                     Kik$brkoutPrem) %>%
   as.data.frame
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 #Useful vars for analysis ------------------------------------------------------
 #Note: state == c(live, suspended, canceled) are mostly ignored in this analysis. 
 #These ambiguous outcomes are generally not insightful
 Kik$kiksrtSuccFail <- dplyr::filter(Kik$kiksrt, state == "successful" | state == "failed")
 
-<<<<<<< HEAD
-=======
-=======
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 #TOPIC: NAME ANALYSIS ##########################################################
 #Determine the optimal name characteristics for a campaign.
 #Do Successful Project Names Differ in Their Character Count? ------------------
@@ -586,20 +331,9 @@ Kik$charPlot <-
   theme(plot.title = element_text(hjust = 0.5)) +
   scale_colour_discrete(name = "Campaign Size")
 
-<<<<<<< HEAD
 #TOPIC: WORD ANALYSIS ----------------------------------------------------------
 #Determine which words are associated with each category -----------------------
 #Overall Top Words 
-=======
-<<<<<<< HEAD
-#TOPIC: WORD ANALYSIS ----------------------------------------------------------
-#Determine which words are associated with each category -----------------------
-#Overall Top Words 
-=======
-#What words are associated with each category? ---------------------------------
-#Overall
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 Kik$kikNm <- dplyr::tibble(name = Kik$kiksrt$name)
 Kik$kikNmTkn <- tidytext::unnest_tokens(Kik$kikNm, word, name) 
 Kik$kikNmTkn <- Kik$kikNmTkn %>%
@@ -658,32 +392,7 @@ Kik$tknRankMain <- function(mainCat) {
   } 
 }
 
-<<<<<<< HEAD
 #Sub Category Word Freq Table Top 100 
-=======
-<<<<<<< HEAD
-#Sub Category Word Freq Table Top 100 
-=======
-#Main Category Freq Table
-Kik$tknRankMain <- function(mainCat) {
-  myMainCat <- mainCat
-  
-  myTkn <- dplyr::filter(Kik$kiksrt,
-                         main_category == myMainCat, state == "successful")
-  myTkn <- dplyr::tibble(name = myTkn$name) %>%
-    tidytext::unnest_tokens(., word, name) 
-  myTkn <- myTkn %>%
-    dplyr::anti_join(Kik$customStopWords)
-  
-  myTknTable <- myTkn %>%
-    dplyr::count(word, sort = TRUE)
-  return(myTknTable)
-  
-}
-
-#Sub Category Freq Table
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 Kik$tknRankSub <- function(subCat) {
   mySubCat <- subCat
   
@@ -696,22 +405,11 @@ Kik$tknRankSub <- function(subCat) {
   
   myTknTable <- myTkn %>%
     dplyr::count(word, sort = TRUE)
-<<<<<<< HEAD
   myTknTable <- myTknTable[1:100,]
-=======
-<<<<<<< HEAD
-  myTknTable <- myTknTable[1:100,]
-=======
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
   return(myTknTable)
   
 }
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 #Main category word cloud Top 60
 Kik$nmTknMainPlot <- function(mainCat) {
   if(mainCat == "All Categories") {
@@ -775,51 +473,6 @@ Kik$tknCatInput <- arrange(Kik$tknCatInput, -desc(mainCategory))
 
 #Subcategory Word Cloud Top 60 
 Kik$nmTknSubPlot <- function(subCat) {
-<<<<<<< HEAD
-  mySubCat <- subCat
-=======
-=======
-#Main category word cloud
-Kik$NmTknMainPlot <- function(mainCat) {
-  myMainCat <- mainCat
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
-  
-  myTkn <- dplyr::filter(Kik$kiksrt,
-                         main_category == myMainCat, state == "successful")
-  myTkn <- dplyr::tibble(name = myTkn$name) %>%
-    tidytext::unnest_tokens(., word, name) 
-  myTkn <- myTkn %>%
-    dplyr::anti_join(Kik$customStopWords)
-  
-  myTknTable <- myTkn %>%
-    dplyr::count(word, sort = TRUE)
-  
-  #Base R title
-  layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
-  par(mar=rep(0, 4))
-  plot.new()
-  text(x=0.5, y=0.5, cex = 1.50,
-<<<<<<< HEAD
-       paste("Top 60 Most Popular Words in", subCat, "Category"))
-=======
-       paste("Top 60 Most Popular Words in", mainCat, "Category"))
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
-  myTknCld <- myTkn %>%
-    count(word) %>%
-    with(wordcloud::wordcloud(word, n, max.words = 60,
-                              color = brewer.pal(8, "Dark2"),
-                              scale = c(3,1.5)))
-<<<<<<< HEAD
-=======
-  
-}
-
-#Kik$NmTknSubPlotInput <- data.frame(subCat = unique(Kik$kiksrt$category))
-#Kik$NmTknSubPlotOutput <- purrr::pmap(Kik$NmTknSubPlotInput, Kik$NmTknSubPlot)
-
-#Subcategory Word Cloud
-Kik$NmTknSubPlot <- function(subCat) {
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
   mySubCat <- subCat
   
   myTkn <- dplyr::filter(Kik$kiksrt,
@@ -837,18 +490,12 @@ Kik$NmTknSubPlot <- function(subCat) {
   par(mar=rep(0, 4))
   plot.new()
   text(x=0.5, y=0.5, cex = 1.50,
-<<<<<<< HEAD
        paste("Top 60 Most Popular Words in", subCat, "Category"))
-=======
-       paste("Top 60 =Most Popular Words in", subCat, "Category"))
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
   myTknCld <- myTkn %>%
     count(word) %>%
     with(wordcloud::wordcloud(word, n, max.words = 60,
                               color = brewer.pal(8, "Dark2"),
                               scale = c(3,1.5)))
-<<<<<<< HEAD
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 }
 
 #Kik$nmTknSubPlotInput <- data.frame(subCat = unique(Kik$kiksrt$category))
@@ -1003,71 +650,6 @@ Kik$tknFxRankInput <- arrange(Kik$tknFxRankInput, -desc(currency))
 
 Kik$tknFxRankInputCat <- data.frame(mainCategory = unique(Kik$kiksrt$main_category))
 Kik$tknFxRankInputCat <- arrange(Kik$tknFxRankInputCat, -desc(mainCategory))
-<<<<<<< HEAD
-=======
-=======
-  
-  
-}
-
-#Kik$NmTknSubPlotInput <- data.frame(subCat = unique(Kik$kiksrt$category))
-#Kik$NmTknSubPlotOutput <- purrr::pmap(Kik$NmTknSubPlotInput, Kik$NmTknSubPlot)
-
-#Are projects in different denominations interested in different categories?----
-#Process
-#1. Create a distribution of word frequency from entire kikstarter dataset
-#2. Compare against word frequency distributions for different currencies
-#3. Make note of words with drastically different rank position to highlight
-#significant differences in the types of products a currency is interested in
-
-#Top 100 words overall
-Kik$kikNmTknPlot <- Kik$kikNmTkn %>%
-  dplyr::count(word, sort = TRUE)
-
-Kik$tknRank100 <- cbind(Kik$kikNmTknPlot[1:100,], rank = 1:100)
-
-
-#Main Category Freq Table FX
-Kik$tknRankMain <- function(mainCat, currency) {
-  myMainCat <- mainCat
-  myCurrency <- currency
-  
-  myTkn <- dplyr::filter(Kik$kiksrt,
-                         main_category == myMainCat, state == "successful",
-                         currency == myCurrency)
-  myTkn <- dplyr::tibble(name = myTkn$name) %>%
-    tidytext::unnest_tokens(., word, name) 
-  myTkn <- myTkn %>%
-    dplyr::anti_join(Kik$customStopWords)
-  
-  myTknTable <- myTkn %>%
-    dplyr::count(word, sort = TRUE)
-  return(myTknTable)
-  
-}
-
-#Find which words are found in both datasets
-test1 <- Kik$tknRankMain("Food", "GBP")[1:100,1]
-test2 <- Kik$tknRankMain("Food", "USD")[1:100,1]
-
-c(test1) %in% c(test2)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 
 #TOPIC: CATEGORY ANALYSIS ######################################################
 #Determine which main_category on average raised the most excess funds. ---------
@@ -1099,7 +681,7 @@ colnames(Kik$catRatioResults) <- c("Main Category", "Excess Funds Raised Multipl
 
 Kik$catRatioResults <- arrange(Kik$catRatioResults, desc(`Excess Funds Raised Multiple`)) %>% 
   DT::datatable(.,
-  caption = "Table 1: This Table Compares Aggregated Excess Funds Raised for All Projects in Each Category.")
+                caption = "Table 1: This Table Compares Aggregated Excess Funds Raised for All Projects in Each Category.")
 
 
 
@@ -1346,214 +928,5 @@ Kik$partialFailPlot <- function(size) {
   return(myPlot)
 }
 
-<<<<<<< HEAD
 Kik$partialFailPlotInputs <- data.frame(size = c("Small", "Med", "Large", "Prem"))
 #purrr::pmap(Kik$partialFailPlotInputs, Kik$partialFailPlot)
-=======
-Kik$partialFailPlotInputs <- data.frame(size = c("Small", "Mid", "Large", "Prem"))
-<<<<<<< HEAD
-#purrr::pmap(Kik$partialFailPlotInputs, Kik$partialFailPlot)
-=======
-purrr::pmap(Kik$partialFailPlotInputs, Kik$partialFailPlot)
-
-
-#TOPIC: OPTIMAL GOAL AMOUNT ####################################################
-#Expected Pledge Amount Per Backer Based On Project Size And Category ----------
-#Given a goal fundraising amount in a particular category,
-#output the expected number of backers and expected donation amount per backer
-
-
-#Step 3: Estimate the average number of backers, and their estimated contribution
-#per backer for a given goal amount
-#Goal amount will be used to classify project size and select appropriate
-#goalExceedRatio to define breakout success
-#If goal range exceeds limits of size classification, then the additional 
-#points will be used and not excluded
-#Range will be defined as +- 20% goalExceedRatio in order to include 
-#enough observations
-
-#Inputs: myGoalAmount
-Kik$bkrStatsFun <- function(myGoalAmount) {
-  if(myGoalAmount < 1302) {
-    myRange <-  dplyr::filter(Kik$brkout,
-                       myGoalAmount*0.8 <= usd_goal_real,
-                       usd_goal_real <= myGoalAmount*1.2) 
-    backerAvgPledge <- (mean(myRange$usd_pledged_real)/mean(myRange$backers)) %>%
-      round(., digits = 2)
-    backerAvgCount <- mean(myRange$backers) %>%
-      round(., digits = 0)
-    paste("For a kickstarter goal of", paste0("$", myGoalAmount, ","),
-          "the average number of backers is", backerAvgCount,
-          "and the average contribution per backer is",
-          paste0("$", backerAvgPledge, "."))
-  } else {
-    if(1302 <= myGoalAmount & myGoalAmount < 3838) {
-      myRange <-  dplyr::filter(Kik$brkout,
-                         myGoalAmount*0.8 <= usd_goal_real,
-                         usd_goal_real <= myGoalAmount*1.2) 
-      backerAvgPledge <- (mean(myRange$usd_pledged_real)/mean(myRange$backers)) %>%
-        round(., digits = 2)
-      backerAvgCount <- mean(myRange$backers) %>%
-        round(., digits = 0)
-      paste("For a kickstarter goal of", paste0("$", myGoalAmount, ","),
-            "the average number of backers is", backerAvgCount,
-            "and the average contribution per backer is",
-            paste0("$", backerAvgPledge, "."))
-    } else {
-      if(3838 <= myGoalAmount & myGoalAmount < 10000) {
-        myRange <-  dplyr::filter(Kik$brkout,
-                           myGoalAmount*0.8 <= usd_goal_real,
-                           usd_goal_real <= myGoalAmount*1.2) 
-        backerAvgPledge <- (mean(myRange$usd_pledged_real)/mean(myRange$backers)) %>%
-          round(., digits = 2)
-        backerAvgCount <- mean(myRange$backers) %>%
-          round(., digits = 0)
-        paste("For a kickstarter goal of", paste0("$", myGoalAmount, ","),
-              "the average number of backers is",
-              backerAvgCount, "and the average contribution per backer is",
-              paste0("$", backerAvgPledge, ".")) 
-      } else {
-        if(10000 <= myGoalAmount) {
-          myRange <-  dplyr::filter(Kik$brkout,
-                             myGoalAmount*0.8 <= usd_goal_real,
-                             usd_goal_real <= myGoalAmount*1.2) 
-          backerAvgPledge <- (mean(myRange$usd_pledged_real)/mean(myRange$backers)) %>%
-            round(., digits = 2)
-          backerAvgCount <- mean(myRange$backers) %>%
-            round(., digits = 0)
-          paste("For a kickstarter goal of", paste0("$", myGoalAmount, ","),
-                "the average number of backers is", backerAvgCount,
-                "and the average contribution per backer is",
-                paste0("$", backerAvgPledge, ".")) 
-        }
-      }
-    }
-  }
-}
-
-
-#Plot myGoalAmount ----------
-#Enable function to give me outputs needed to create plot
-Kik$goalAmtFunPlot <- function(myGoalAmount) {
-  if(myGoalAmount < 1302) {
-    myRange <-  dplyr::filter(Kik$brkout, myGoalAmount*0.8 <= usd_goal_real, usd_goal_real <= myGoalAmount*1.2) 
-    backerAvgPledge <- (mean(myRange$usd_pledged_real)/mean(myRange$backers)) %>%
-      round(., digits = 2)
-    backerAvgCount <- mean(myRange$backers) %>%
-      round(., digits = 0)
-    myDf <- data.frame(x = backerAvgPledge,
-                       x1 = backerAvgCount)
-    colnames(myDf) <- c("backerAvgPledge", "backerAvgCount")
-    myDf
-  } else {
-    if(1302 <= myGoalAmount & myGoalAmount < 3838) {
-      myRange <-  dplyr::filter(Kik$brkout, myGoalAmount*0.8 <= usd_goal_real, usd_goal_real <= myGoalAmount*1.2) 
-      backerAvgPledge <- (mean(myRange$usd_pledged_real)/mean(myRange$backers)) %>%
-        round(., digits = 2)
-      backerAvgCount <- mean(myRange$backers) %>%
-        round(., digits = 0)
-      myDf <- data.frame(x = backerAvgPledge,
-                         x1 = backerAvgCount)
-      colnames(myDf) <- c("backerAvgPledge", "backerAvgCount")
-      myDf
-    } else {
-      if(3838 <= myGoalAmount & myGoalAmount < 10000) {
-        myRange <-  dplyr::filter(Kik$brkout, myGoalAmount*0.8 <= usd_goal_real, usd_goal_real <= myGoalAmount*1.2) 
-        backerAvgPledge <- (mean(myRange$usd_pledged_real)/mean(myRange$backers)) %>%
-          round(., digits = 2)
-        backerAvgCount <- mean(myRange$backers) %>%
-          round(., digits = 0)
-        myDf <- data.frame(x = backerAvgPledge,
-                           x1 = backerAvgCount)
-        colnames(myDf) <- c("backerAvgPledge", "backerAvgCount")
-        myDf
-      } else {
-        if(10000 <= myGoalAmount) {
-          myRange <-  dplyr::filter(Kik$brkout, myGoalAmount*0.8 <= usd_goal_real, usd_goal_real <= myGoalAmount*1.2) 
-          backerAvgPledge <- (mean(myRange$usd_pledged_real)/mean(myRange$backers)) %>%
-            round(., digits = 2)
-          backerAvgCount <- mean(myRange$backers) %>%
-            round(., digits = 0)
-          myDf <- data.frame(x = backerAvgPledge,
-                             x1 = backerAvgCount)
-          colnames(myDf) <- c("backerAvgPledge", "backerAvgCount")
-          myDf
-        }
-      }
-    }
-  }
-}
-
-#Create four different plots depending on the size of the project #EDIT
-#Plot a subset of points then connect
-#Small seq(0,1302, by 100)
-#TODO Cut by an even number of points
-#TODO Fix variable names
-Kik$goalFunSeq <- seq(1, 700000, by = 100) %>%
-  data.frame
-colnames(Kik$goalFunSeq) <- c("myGoalAmount")
-Kik$goalFunMap <- pmap(Kik$goalFunSeq, Kik$goalAmtFunPlot) %>%
-  unlist %>%
-  as.numeric
-
-length(Kik$goalFunMap)
-#Average Pledge
-
-Kik$goalFunSeqData <- data.frame(x = Kik$goalFunMap[seq(1, 14000, by = 2)],
-                             x1 = Kik$goalFunMap[seq(0, 14000, by = 2)[-1]])
-Kik$goalFunSeqData$GoalAmount <- seq(1, 700000, by = 100)
-colnames(Kik$goalFunSeqData) <- c("BackerAvgPledge", "BackerAvgCount", "GoalAmount")
-
-
-#The more backers a project has, the more money they contribute??
-#This could make sense because successful projects need to meet 100% of their goal
-#in order to be funded
-#So large projects need more backers who contribute increasing amounts of more money
-#One would think that per contribution numbers would be more stagnant
-
-
-
-
-
-##################
-
-#We see a log decreasing (?) function
-#On average, more backers actually mean a higher average contribution
-#This implies that the strategy for successful projects is getting higher donations per backer
-#Not a whole bunch of backers who donate small amounts
-#Is this accurate? How can I validate???
-#Wait i need to plot this against goal size
-#The number of backers does not follow a linear model when GoalAmount goes up!!
-#This is the key insight. On average you dont attract more backers, you attract
-#backers with more money
-#Why arent really big projects just getting funded by 10000 people with $1?
-#Why why why???? Maybe this has to do with kickerstarter tiers encouraging 
-#people to give more money EDIT:investigate this
-#So naturally if its not a 1 to 1 then less people need to increase their average
-#contribution size in order for a project to be successful
-#ohhh so if its a linear model then 1 (2500,45) (5000, 75)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
->>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
-
-
