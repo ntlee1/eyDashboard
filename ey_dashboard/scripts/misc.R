@@ -432,33 +432,23 @@ Kik$ggAutoTheme
 
 
 
-
-
-<h3 style = "text-align: center;">This Dashboard Delivers Actionable Insights Including:</h3>
-  <ul>
-  <li>Compare and contrast popular trends between foreign currencies</li>
-  <li>Find out which subcategories are the most popular</li>
-  <li>See how close failed projects come to reaching their goal</li>
-  <li>and more!</li>
-  </ul>
-  <hr />
   
   
   
   
   
-  
-  
-  
-  
-  
+  Kik$timelineStCt <- dplyr::filter(Kik$timeline, state == c("successful", "failed")) %>%
+  dplyr::group_by(state, launchYear) %>%
+  dplyr::summarise("n()" = count(state))
+  Kik$timelineStCt
   
 
 
 
 
-
-
+must define all namespaces for shiny function. 
+special cases
+  dplyr::summarise(`n()` = length(state))
 
 
 

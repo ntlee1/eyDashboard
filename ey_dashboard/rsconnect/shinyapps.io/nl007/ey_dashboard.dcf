@@ -1,0 +1,14 @@
+name: ey_dashboard
+title: ey_dashboard
+username:
+account: nl007
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4294840
+bundleId: 4736284
+url: https://nl007.shinyapps.io/ey_dashboard/
+when: 1624201365.60852
+lastSyncTime: 1624201365.60852
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: scripts/.Rhistory|scripts/misc.R

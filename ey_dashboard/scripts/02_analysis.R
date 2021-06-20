@@ -87,16 +87,16 @@ Kik$plgNa <- Kik$naOut$`usd pledged`
 #When state == undefined, I noticed usd pledged is NA in every observation. 
 #It appears the API relies on state being defined to give usd pledged a value. 
 #We can still infer campaign success by usd_pledged_real >= usd_goal_real.
-Kik$stUnd <- (filter(Kik$kiksrt, state == "undefined"))
+Kik$stUnd <- (dplyr::filter(Kik$kiksrt, state == "undefined"))
 sum(is.na(Kik$stUnd$`usd pledged`)) == nrow(Kik$stUnd)
-Kik$stUndSucc <- (filter(Kik$kiksrt, state == "undefined" &
+Kik$stUndSucc <- (dplyr::filter(Kik$kiksrt, state == "undefined" &
                            usd_pledged_real >= usd_goal_real))
 Kik$stUndSucc$state <- "successful"
 
-Kik$stUndFail <- (filter(Kik$kiksrt, state == "undefined" &
+Kik$stUndFail <- (dplyr::filter(Kik$kiksrt, state == "undefined" &
                            usd_pledged_real <= usd_goal_real))
 Kik$stUndFail$state <- "failed"
-Kik$kiksrt <- filter(Kik$kiksrt, !state == "undefined") %>%
+Kik$kiksrt <- dplyr::filter(Kik$kiksrt, !state == "undefined") %>%
   rbind(Kik$stateNoUndef, Kik$stUndSucc, Kik$stUndFail)
 
 #Eliminate projects with funds raised but number of backers is missing ---------
@@ -188,7 +188,7 @@ Kik$aud$kik_rate <- Kik$aud$pledged/Kik$aud$`usd pledged`
 
 Ofx$ofxUsdAud$Date <- as.Date(Ofx$ofxUsdAud$Date, format = "%Y-%m-%d")
 colnames(Ofx$ofxUsdAud) <- c("deadline", "ofx_rate")
-Kik$aud <- right_join(Kik$aud, Ofx$ofxUsdAud, by = "deadline")
+Kik$aud <- dplyr::right_join(Kik$aud, Ofx$ofxUsdAud, by = "deadline")
 Kik$audOfxFixer <- Kik$aud$fixer_rate/Kik$aud$ofx_rate
 
 #Fixer.io forex conversion is highly accurate. 
@@ -350,7 +350,7 @@ Kik$kikNmTkn %>%
   dplyr::count(word, sort = TRUE)
 
 #Canceled projects have word "canceled in campaign name. Filtered out for redundancy. 
-Kik$customStopWords <- bind_rows(tibble(word = c("canceled"),
+Kik$customStopWords <- dplyr::bind_rows(dplyr::tibble(word = c("canceled"),
                                         lexicon = c("custom")),
                                  stop_words)
 Kik$kikNmTkn <- Kik$kikNmTkn %>%
@@ -419,6 +419,7 @@ Kik$tknRankSub <- function(subCat) {
 }
 
 #Main category word cloud Top 60
+
 Kik$nmTknMainPlot <- function(mainCat) {
   if(mainCat == "All Categories") {
     myTkn <- dplyr::filter(Kik$kiksrt, state == "successful")
@@ -431,16 +432,17 @@ Kik$nmTknMainPlot <- function(mainCat) {
       dplyr::count(word, sort = TRUE)
     
     #Base R title
-    layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
-    par(mar=rep(0, 4))
-    plot.new()
-    text(x=0.5, y=0.5, cex = 1.50,
+    graphics::layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
+    graphics::par(mar=rep(0, 4))
+    graphics::plot.new()
+    graphics::text(x=0.5, y=0.5, cex = 1.50,
          paste("Top 60 Most Popular Words in All Categories"))
     myTknCld <- myTkn %>%
-      count(word) %>%
+      dplyr::count(word) %>%
       with(wordcloud::wordcloud(word, n, max.words = 60,
                                 color = brewer.pal(8, "Dark2"),
                                 scale = c(3,1.5)))
+    return(myTknCld)
   }else{
     myMainCat <- mainCat
     
@@ -455,17 +457,17 @@ Kik$nmTknMainPlot <- function(mainCat) {
       dplyr::count(word, sort = TRUE)
     
     #Base R title
-    layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
-    par(mar=rep(0, 4))
-    plot.new()
-    text(x=0.5, y=0.5, cex = 1.50,
+  graphics::layout(matrix(c(1, 2), nrow=2), heights=c(1, 4))
+    graphics::par(mar=rep(0, 4))
+    graphics::plot.new()
+    graphics::text(x=0.5, y=0.5, cex = 1.50,
          paste("Top 60 Most Popular Words in", mainCat, "Category"))
     myTknCld <- myTkn %>%
-      count(word) %>%
+      dplyr::count(word) %>%
       with(wordcloud::wordcloud(word, n, max.words = 60,
                                 color = brewer.pal(8, "Dark2"),
                                 scale = c(3,1.5)))
-    
+    return(myTknCld)
   }
 }
 
@@ -474,7 +476,7 @@ Kik$nmTknMainPlot <- function(mainCat) {
 Kik$tknCatInput <- data.frame(mainCategory = unique(Kik$kiksrt$main_category))
 Kik$tknCatInput$mainCategory <- as.character(Kik$tknCatInput$mainCategory)
 Kik$tknCatInput[16,1] <- "All Categories"
-Kik$tknCatInput <- arrange(Kik$tknCatInput, -desc(mainCategory))
+Kik$tknCatInput <- arrange(Kik$tknCatInput, -dplyr::desc(mainCategory))
 
 #Kik$nmTknSubPlotInput <- data.frame(subCat = unique(Kik$kiksrt$category))
 #Kik$nmTknSubPlotOutput <- purrr::pmap(Kik$nmTknSubPlotInput, Kik$nmTknSubPlot)
@@ -500,7 +502,7 @@ Kik$nmTknSubPlot <- function(subCat) {
   text(x=0.5, y=0.5, cex = 1.50,
        paste("Top 60 Most Popular Words in", subCat, "Category"))
   myTknCld <- myTkn %>%
-    count(word) %>%
+    dplyr::count(word) %>%
     with(wordcloud::wordcloud(word, n, max.words = 60,
                               color = brewer.pal(8, "Dark2"),
                               scale = c(3,1.5)))
@@ -654,10 +656,10 @@ Kik$tknFxRank <- function(mainCat, baseCurr, curr2) {
 
 #Alphabetical inputs for shiny
 Kik$tknFxRankInput <- data.frame(currency = unique(Kik$kiksrt$currency))
-Kik$tknFxRankInput <- arrange(Kik$tknFxRankInput, -desc(currency))
+Kik$tknFxRankInput <- arrange(Kik$tknFxRankInput, -dplyr::desc(currency))
 
 Kik$tknFxRankInputCat <- data.frame(mainCategory = unique(Kik$kiksrt$main_category))
-Kik$tknFxRankInputCat <- arrange(Kik$tknFxRankInputCat, -desc(mainCategory))
+Kik$tknFxRankInputCat <- arrange(Kik$tknFxRankInputCat, -dplyr::desc(mainCategory))
 
 #TOPIC: CATEGORY ANALYSIS ######################################################
 #Determine which main_category on average raised the most excess funds. ---------
@@ -681,13 +683,13 @@ colnames(Kik$mainCatRatioInput) <- "mainCategory"
 Kik$mainCatRatioInput$mainCategory <- as.character(Kik$mainCatRatioInput$mainCategory)
 
 #Design has the highest ratio of funds pledged per goal. 400% pledged to goal. 
-Kik$catRatioResults <- pmap(Kik$mainCatRatioInput, Kik$mainCatRatio) %>%
+Kik$catRatioResults <- purrr::pmap(Kik$mainCatRatioInput, Kik$mainCatRatio) %>%
   unlist %>%
   matrix(., nrow = 15, byrow = TRUE) %>%
   as.data.frame 
 colnames(Kik$catRatioResults) <- c("Main Category", "Excess Funds Raised Multiple")
 
-Kik$catRatioResults <- arrange(Kik$catRatioResults, desc(`Excess Funds Raised Multiple`)) %>% 
+Kik$catRatioResults <- arrange(Kik$catRatioResults, dplyr::desc(`Excess Funds Raised Multiple`)) %>% 
   DT::datatable(.,
                 caption = "Table 1: This Table Compares Aggregated Excess Funds Raised for All Projects in Each Category.")
 
@@ -706,13 +708,12 @@ Kik$timelineStCtInput$kikSize[1] <- "All Projects"
 Kik$timelineStCtInput$kikSize[2:5] <- levels(Kik$kiksrt$size) %>%
   as.character
 
-
 Kik$timelineStCtPlot <- function(kikSize) {
   if(kikSize == "All Projects") {
     
     Kik$timelineStCt <- dplyr::filter(Kik$timeline, state == c("successful", "failed")) %>%
       dplyr::group_by(state, launchYear) %>%
-      summarise(n())
+      dplyr::summarise(`n()` = length(state))
     
     myPlot <-  Kik$timelineStCt %>%
       ggplot2::ggplot(., aes(x = launchYear, y = `n()`, fill = state)) +
@@ -737,8 +738,8 @@ Kik$timelineStCtPlot <- function(kikSize) {
                                       state == c("successful", "failed"),
                                       size == mySize) %>%
       dplyr::group_by(state, launchYear) %>%
-      summarise(n())
-    
+      dplyr::summarise(`n()` = length(state))
+  
     myPlot <- Kik$timelineStCt %>%
       ggplot2::ggplot(., aes(x = launchYear, y = `n()`, fill = state)) +
       geom_col(position = "stack") +
@@ -769,7 +770,7 @@ Kik$mainCatPlot <- function(mainCategory, kikSize) {
     
     mySubcatPlot <- Kik$catSmry %>%
       dplyr::group_by(main_category, category, state) %>%
-      summarise(n()) %>%
+      dplyr::summarise(`n()` = length(state)) %>%
       dplyr::filter(.,
                     main_category == myMainCategory &
                       !category == myMainCategory) %>%
@@ -796,7 +797,7 @@ Kik$mainCatPlot <- function(mainCategory, kikSize) {
     mySubcatPlot <- Kik$catSmry %>%
       dplyr::filter(., size == mySize) %>%
       dplyr::group_by(main_category, category, state) %>%
-      summarise(n()) %>%
+      dplyr::summarise(`n()` = length(state)) %>%
       dplyr::filter(.,
                     main_category == myMainCategory &
                       !category == myMainCategory) %>%
@@ -821,7 +822,7 @@ Kik$mainCatPlot <- function(mainCategory, kikSize) {
 
 
 Kik$mainCatPlotInput <- data.frame(mainCategory = unique(Kik$kiksrt$main_category))
-Kik$mainCatPlotInput <- arrange(Kik$mainCatPlotInput, -desc(mainCategory))
+Kik$mainCatPlotInput <- arrange(Kik$mainCatPlotInput, -dplyr::desc(mainCategory))
 
 Kik$mainCatPlotInputSz <- data.frame(kikSize = c(1:5))
 Kik$mainCatPlotInputSz$kikSize[1] <- "All Sizes"
@@ -853,8 +854,8 @@ Kik$kikPartialFail <- dplyr::filter(Kik$kikPartialFail, state == "failed")
 Kik$kikPartialFail$partialFail <- Kik$kikPartialFail$usd_pledged_real/Kik$kikPartialFail$usd_goal_real
 
 #Overall ~159k projects raised some money. ~40k small projects raised no money
-count(dplyr::filter(Kik$kikPartialFail, !partialFail == 0))
-count(dplyr::filter(Kik$kikPartialFail, partialFail == 0))
+dplyr::count(dplyr::filter(Kik$kikPartialFail, !partialFail == 0))
+dplyr::count(dplyr::filter(Kik$kikPartialFail, partialFail == 0))
 
 #Small
 Kik$kikPartialFailSmall <- dplyr::filter(Kik$kikPartialFail, size == "Small",

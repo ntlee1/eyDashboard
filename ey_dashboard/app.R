@@ -1,3 +1,7 @@
+source(here::here("scripts", "01_tidy_import.R"), local = TRUE) 
+source(here::here("scripts", "02_analysis.R"), local = TRUE)
+
+
 library(shiny)
 library(shinyalert)
 library(here)
@@ -186,6 +190,7 @@ server <- function(input, output, session) {
     myTable <- Kik$tknFxRank(mainCat = myCat, baseCurr = myFx1, curr2 = myFx2)
     
   })
+  
   output$partialFundPlot <- plotly::renderPlotly({
     inputPlot <- input$partialPlot
     Kik$partialFailPlot(inputPlot)
