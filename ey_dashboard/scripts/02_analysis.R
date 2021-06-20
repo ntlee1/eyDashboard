@@ -13,7 +13,7 @@ Shy$palBkGround <- "#1C2134"
 Kik$kikstrtWebImpt <- "https://raw.githubusercontent.com/ntlee1/eyDashboard/dba2839af59d52be7695b4706a14e1af3c9999e7/data/Kickstarter%20Data/ksprojects.csv"
 
 #Ofx fx data
-Ofx$ofxImportUSDAUD <- "https://raw.githubusercontent.com/ntlee1/eyDashboard/988807393d5710e1c2c3801c09073e59a3e21718/data/ofx_fx_data/USDAUD_ofx.csv"
+Ofx$ofxImportUSDAUD <- "https://raw.githubusercontent.com/ntlee1/eyDashboard/80722297859c2d87f4299eb41587ed48d67955b9/data/ofx_fx_data/USDAUD_ofx.csv"
 
 #TOPIC: WRANGLE ################################################################
 #Import Data -------------------------------------------------------------------
@@ -178,8 +178,6 @@ Kik$usdFixerAcc <- sum(Kik$usdFixer)/Kik$usdNum
 #Data source: https://www.ofx.com/en-us/forex-news/historical-exchange-rates/
 #Note that exact values will differ. Ofx takes into account time of day.
 #YMD 
-Ofx <- new.env()
-
 Ofx$ofxUsdAud <- readr::read_csv(Ofx$ofxImportUSDAUD)
 
 Kik$aud <- dplyr::filter(Kik$kiksrt, `currency` == "AUD")
