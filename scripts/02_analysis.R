@@ -1,16 +1,26 @@
-#Environments start with uppercase
+#Environments start with uppercase ---------------------------------------------
 #For kikstarter data
 Kik <- new.env()
 #For Shiny 
 Shy <- new.env()
+#Ofx FX
+Ofx <- new.env()
 #Shiny Palette
 Shy$palBkGround <- "#1C2134"
 
+#Remote Files ------------------------------------------------------------------
+#Kickstarter Data
+Kik$kikstrtWebImpt <- "https://raw.githubusercontent.com/ntlee1/eyDashboard/dba2839af59d52be7695b4706a14e1af3c9999e7/data/Kickstarter%20Data/ksprojects.csv"
+
+#Ofx fx data
+Ofx$ofxImportUSDAUD <- "https://raw.githubusercontent.com/ntlee1/eyDashboard/988807393d5710e1c2c3801c09073e59a3e21718/data/ofx_fx_data/USDAUD_ofx.csv"
+
 #TOPIC: WRANGLE ################################################################
 #Import Data -------------------------------------------------------------------
-Kik$pathKikData <- here::here("data", "Kickstarter Data","ksprojects.csv")
-Kik$kiksrt <- readr::read_csv(Kik$pathKikData) %>%
-  as_tibble
+#Kik$pathKikData <- here::here("data", "Kickstarter Data","ksprojects.csv")
+#Kik$kiksrt <- readr::read_csv(Kik$pathKikData) %>%
+#  as_tibble
+Kik$kiksrt <- read_csv(Kik$kikstrtWebImpt)
 
 #Convert select cols to factor for easier manipulation
 Kik$colFct <- c("category",
@@ -170,8 +180,8 @@ Kik$usdFixerAcc <- sum(Kik$usdFixer)/Kik$usdNum
 #YMD 
 Ofx <- new.env()
 
-Ofx$ofxUsdAud <- readxl::read_xlsx(here::here("data", "ofx_fx_data",
-                                              "USDAUD_ofx.xlsx"))
+Ofx$ofxUsdAud <- readr::read_csv(Ofx$ofxImportUSDAUD)
+
 Kik$aud <- dplyr::filter(Kik$kiksrt, `currency` == "AUD")
 
 #Derive fx conversion rates, kikstarter and fixer.io
