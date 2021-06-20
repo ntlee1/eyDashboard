@@ -127,7 +127,7 @@ ui <- fluidPage(
                  tabPanel("About",
                           div(htmlOutput("aboutMe"),
                               style = Shy$palWhite),
-                          div(includeHTML(here::here("html","about.html"))),
+                          div(includeHTML("https://raw.githubusercontent.com/ntlee1/eyDashboard/main/html/about.html")),
                           style = "color: white")
     ),
     mainPanel(
@@ -141,23 +141,23 @@ server <- function(input, output, session) {
   output$myFundsRatio <- DT::renderDT(Kik$catRatioResults)
   
   observeEvent(input$btnTimeline, {
-    showModal(modalDialog(includeHTML(here::here("html","genSumNewCamp.html")), 
+    showModal(modalDialog(includeHTML("https://raw.githubusercontent.com/ntlee1/eyDashboard/main/html/genSumNewCamp.html"), 
                           easyClose = TRUE))
   })
   observeEvent(input$btnFunRat, {
-    showModal(modalDialog(includeHTML(here::here("html","genSumFunRat.html")), 
+    showModal(modalDialog(includeHTML("https://raw.githubusercontent.com/ntlee1/eyDashboard/main/html/genSumFunRat.html"), 
                           easyClose = TRUE))
   })
   observeEvent(input$btnPartialFun, {
-    showModal(modalDialog(includeHTML(here::here("html","genSumPartialFun.html")), 
+    showModal(modalDialog(includeHTML("https://raw.githubusercontent.com/ntlee1/eyDashboard/main/html/genSumPartialFun.html"), 
                           easyClose = TRUE))
   })
   observeEvent(input$btnWCloud, {
-    showModal(modalDialog(includeHTML(here::here("html","nmWCloud.html")), 
+    showModal(modalDialog(includeHTML("https://raw.githubusercontent.com/ntlee1/eyDashboard/main/html/nmWcloud.html"), 
                           easyClose = TRUE))
   }) 
   observeEvent(input$btnFxRank, {
-    showModal(modalDialog(includeHTML(here::here("html","nmFxRank.html")), 
+    showModal(modalDialog(includeHTML("https://raw.githubusercontent.com/ntlee1/eyDashboard/main/html/nmFxRank.html"), 
                           easyClose = TRUE))
   }) 
   
