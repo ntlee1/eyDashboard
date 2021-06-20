@@ -54,7 +54,11 @@ Kik$duplicateIdKik <- dplyr::filter(Kik$kiksrt, ID %in% Kik$duplicateId$Var1)
 Kik$kiksrt <- Kik$kiksrt[!duplicateinstd(Kik$kiksrt[,c("ID")]),]
 #TRUE
 length(Kik$kiksrt$ID) == length(unique(Kik$kiksrt$ID))
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+>>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 
 #Name length recommender
 #Purpose: Give optimal project name length based on campaign goal
@@ -333,6 +337,12 @@ Kik$tknFxRank("Art", "SGD", "NOK")
 
 
 
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
+
+>>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 
 
 

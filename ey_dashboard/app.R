@@ -45,6 +45,10 @@ ui <- fluidPage(
  #                         htmlOutput("introVid")),
                  tabPanel("General Summary",
                           tabsetPanel(
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
                             tabPanel(div("New Campaign Timeline",
                                          style = Shy$palEyYellow),
                                      (actionButton("btnTimeline", label = "Click for Info",
@@ -60,6 +64,17 @@ ui <- fluidPage(
                                                  div("Select Main Category",
                                                      style = Shy$palWhite),
                                                  choices = Kik$mainCatPlotInput$mainCategory,
+<<<<<<< HEAD
+=======
+=======
+                            tabPanel("New Project Timeline",
+                                     Kik$timelineStCtPlot),
+                            tabPanel("Category ",
+                                     selectInput("subcatPlot",
+                                                 "Select Subcategory",
+                                                 choices = c(Kik$subCatPlotInput$mainCategory),
+>>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
+>>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
                                                  selected = "Art"),
                                      selectInput("mainCatPlotSz",
                                                  div("Select Project Size",
@@ -195,7 +210,39 @@ server <- function(input, output, session) {
     tags$iframe(src = "https://www.youtube.com/embed/hfPnq3i4Udw",
                 width = 600, height = 400)
   })
+<<<<<<< HEAD
 
+=======
+  
+<<<<<<< HEAD
+  output$campaignCountCat <- renderPlot({
+    myCat <- input$mainCatPlot
+    mySize <- input$mainCatPlotSz
+    Kik$mainCatPlot(mainCategory = myCat, kikSize = mySize)
+=======
+
+  #EDIT Plotly in viewer pane not
+  #EDIT Fix order
+  output$myPlot <- renderPlot({
+    switch(input$subcatPlot, 
+           "Food" = Kik$subCatPlotOutput[1],
+           "Music" = Kik$subCatPlotOutput[2],
+           "Comics" = Kik$subCatPlotOutput[3],
+           "Design" = Kik$subCatPlotOutput[4],
+           "Art" = Kik$subCatPlotOutput[5],
+           "Fashion" = Kik$subCatPlotOutput[6],
+           "Film & Video" = Kik$subCatPlotOutput[7],
+           "Publishing" = Kik$subCatPlotOutput[8],
+           "Technology" = Kik$subCatPlotOutput[9],
+           "Games" = Kik$subCatPlotOutput[10],
+           "Photography" = Kik$subCatPlotOutput[11],
+           "Dance" = Kik$subCatPlotOutput[12],
+           "Crafts" = Kik$subCatPlotOutput[13],
+           "Journalism" = Kik$subCatPlotOutput[14],
+           "Theater" = Kik$subCatPlotOutput[15])
+>>>>>>> b8810510fc1d6fa3c698f1545a21df855412e0b4
+  })
+>>>>>>> 64d38e589a9ae0f3e4836c1d1dcb096fdad1e886
 }
 
 shinyApp(ui, server)
